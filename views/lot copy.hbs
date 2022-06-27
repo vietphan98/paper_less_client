@@ -1,0 +1,212 @@
+
+
+
+    <div style="width:100%;height:100%;overflow: auto;" id="bodyMain">
+        <div style="width:100%;height: 30px; background:rgb(0, 0, 0); color:white;font-size:15pt;" id="HeaderBody">
+            <div style="float:left;width:100px;height:100%">            
+                <button style="height:100%;width:100%">Save</button>
+            </div>
+            <div style="text-align:center;float:left;width:calc(100% - 110px);line-height:1.2;font-weight:bold">
+                BẢNG PHÂN PHỐI SỐ LƯỢNG YÊU CẦU THEO LOT - {{ID_JOB}}
+            </div>
+        </div>
+        <div style="width:100%;height: 170px;">
+            <div style="width:40%;height:100%;float:left;">
+                <table style="width:100%;height:100%;">
+                     <tr style="height:1%">
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr style="height:24%">
+                        <td class="borderCell">Số lệnh SX</td>
+                        <td class="borderCell" style="font-weight:bold">{{ID_JOB}}</td>
+                    </tr>
+                    <tr style="height:18%">
+                        <td class="borderCell">Ngày làm lệnh</td>
+                        <td class="borderCell" style="font-weight:bold">05-Apr-22</td>
+                    </tr>
+                    <tr style="height:19%">
+                        <td class="borderCell">SO Line</td>
+                        <td class="borderCell" style="font-weight:bold">75214562-2</td>
+                    </tr>
+                    <tr style="height:18%">
+                        <td class="borderCell">Oracle Item</td>
+                        <td class="borderCell" style="font-weight:bold">1-276574-000-00</td>
+                    </tr>
+                    <tr style="height:19%">
+                        <td class="borderCell">Số lượng</td>
+                        <td class="borderCell" style="font-weight:bold">8630</td>
+                    </tr>
+                     <tr style="height:1%">
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="width:20%;height:100%;float:left">
+                <table style="width:100%;height:100%;">
+                    <tr style="height:20%">
+                        <td rowspan="5" style="width:15%"></td>
+                        <td>Số UPS</td>
+                        <td rowspan="5" style="width:15%"></td>
+                    </tr>
+                    <tr style="height:20%">
+                        <td style="background:yellow;border:1px black solid;font-weight:bold;text-align:center">16</td>
+                    </tr>
+                    <tr style="height:30%">
+                        <td style="">INLAY SCRAP</td>
+                    </tr>
+                    <tr style="height:20%">
+                        <td style="background:yellow;border:1px black solid;font-weight:bold;text-align:center">-100.00%</td>
+                    </tr>
+                    <tr style="height:10%">
+                        <td style=""></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="width:40%;height:100%;float:left;">
+                <table style="width:100%;height:100%;">
+                    <tr style="height:1%">
+                        <td style="width:30%"></td>
+                        <td style="width:40%"></td>
+                        <td style="width:30%"></td>
+                    </tr>
+                    <tr style="height:15%">
+                        <td class="borderCell" colspan="2">Ngày giao hàng yêu cầu</td>
+                        <td class="borderCell" style="font-weight:bold;background: yellow">15-Apr-22</td>
+                    </tr>
+                    <tr style="height:15%">
+                        <td class="borderCell" colspan="2">Promise Date</td>
+                        <td class="borderCell" style="font-weight:bold;background: yellow">05-Apr-22</td>
+                    </tr>
+                    <tr style="height:15%">
+                        <td class="borderCell">GPM batch:</td>
+                        <td class="borderCell" colspan="2" style="font-weight:bold;background: yellow">3316533</td>
+                    </tr>
+                    <tr style="height:33%">
+                        <td class="borderCell">RBO:</td>
+                        <td class="borderCell" colspan="2" style="font-weight:bold;background: yellow">RYOHIN KEIKAKU</td>
+                    </tr>
+                    <tr style="height:20%">
+                        <td class="borderCell">Order Item:</td>
+                        <td class="borderCell" colspan="2" style="font-weight:bold;background: yellow">MUJI-KRS001-ICR2</td>
+                    </tr>
+                    <tr style="height:1%">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div style="width:100%;height: calc(100% - 200px); background:blanchedalmond;" id="GridMain"></div>
+    </div>
+
+<style>
+
+    #GridMain{
+        width:100% !important;
+    }
+
+    td.borderCell {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding-left:5px;
+    }
+
+</style>
+
+<script>
+    var gridMain;
+    var colCur = [];
+    var doOnLoad = () => {
+        let colID = ["LOT","SKU_CALIB","GPM_QTY","EPC_R","EPC_A","QC_R","QC_A","SORTING_R","SORTING_A","DIECUT_R","DIECUT_A","PFB_R","PFB_A"]
+        let colType = [];
+        let colColor = [];
+        colID.forEach((id) => {
+            if(id.split('_')[0] == "{{Route}}") {
+                colType.push("ed");
+                colColor.push("#d5f1ff");
+                colCur.push(colID.indexOf(id));
+            }
+            else {
+                colType.push("ro");
+                colColor.push("");
+            }
+        })
+
+        colType[1] = "ed";
+        colColor[1] = "yellow";
+
+        gridMain = new dhtmlXGridObject('GridMain');
+
+        gridMain.setHeader("0,1,2,3,4,5,6,7,8,9,10,11,12")
+        gridMain.attachHeader("<b>LOT</b>,<b>SKU Canh Bài</b>,<b>Số GPM Yêu cầu</b>,EPC 100%,#cspan,QC 100%,#cspan,Sorting,#cspan,Die cutting,#cspan,Printing front-back,#cspan");
+        gridMain.attachHeader("#rspan,#rspan,#rspan,pcs,#cspan,pcs,#cspan,sheet,#cspan,sheet,#cspan,sheet,#cspan");
+        gridMain.attachHeader("#rspan,#rspan,#rspan,Yêu cầu,Thực tế,Yêu cầu,Thực tế,Yêu cầu,Thực tế,Yêu cầu,Thực tế,Yêu cầu,Thực tế");
+        gridMain.attachHeader("Total,#cspan,8.630,8.630,#cspan,8.646,#cspan,567,#cspan,567,#cspan,602,#cspan");
+        gridMain.setColumnColor(colColor.join(","));
+        gridMain.setColumnIds(colID.join(","));
+        gridMain.setColTypes(colType.join(","));
+        gridMain.setInitWidths("50,50,*,*,*,*,*,*,*,*,*,*,*");
+        gridMain.setColumnMinWidth("20,50,50,50,50,50,50,50,50,50,50,50,50");
+        gridMain.setColAlign("center,center,center,center");
+
+        gridMain.setStyle(
+            "text-align:center;font-weight:bold;",
+            "","background: blanchedalmond",""
+        );
+
+        gridMain.init();
+        gridMain.detachHeader(0);
+
+        let n = 1;
+        while (n < 100) {
+            gridMain.addRow(n,[n,"{{ID_JOB}}"]);
+            n++;
+        }
+        
+        gridMain.attachEvent("onKeyPress", (code,cFlag,sFlag) => {
+            if(cFlag && code == 83) {
+                alert("Hahaha");
+                gridMain.SaveData(colCur);
+            }
+        });
+    }
+
+    dhtmlXGridObject.prototype.SaveData = (col) => {
+        console.log(col.length);
+        let dataSend = [];
+        gridMain.forEachRow((id) => {
+            let seq, sku, route, val;
+            let routeValue = [];
+            sku = gridMain.cells(id,1).getValue();
+            if(sku != "" && sku != undefined) {
+                seq = gridMain.cells(id,0).getValue();
+                col.forEach((c) => {
+                    route = gridMain.getColumnId(c).split('_');
+                    val = gridMain.cells(id,c).getValue();
+
+                    if(route.length == 2) {
+                        routeValue.push({
+                            "ROUTE": route[0],
+                            "CONFIRM": route[1],
+                            "VALUE": val,
+                        })
+                    }
+
+                })
+
+                dataSend.push({
+                    "SEQ" : seq,
+                    "SKU" : sku,
+                    "SOLINE" : "{{ID_JOB}}",
+                    "DATA" : routeValue
+                });
+            }
+        })
+        console.log(dataSend);
+    }
+</script>

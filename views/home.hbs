@@ -1,0 +1,399 @@
+
+
+
+    <div style="width:100%;height:100%;overflow: auto;" id="bodyMain">
+        <div style="width:100%;height: 30px; background:rgb(0, 0, 0); color:white;font-size:15pt;" id="HeaderBody">
+            <div style="float:left;width:300px;height:100%;line-height:1.2">            
+                Báo cáo khu vực làm việc sạch sẽ
+            </div>
+            <div style="text-align:center;float:right;width:250px;height:100%;line-height:1.2;color:black;background:yellow">
+                 PO: {{ID_JOB}}
+            </div>
+            <div style="text-align:center;float:right;width:250px;height:100%;line-height:1.2;color:white;background:rgb(104, 0, 0)">
+                 SO: <a ID="SO"></a>
+            </div>
+            <div style="text-align:center;float:right;width:250px;height:100%;line-height:1.2;color:black;background:rgb(255, 255, 255)">
+                 ID: <a ID="ID"></a>
+            </div>
+        </div>
+        <div style="width:100%;height: calc(100% - 30px); background:blanchedalmond;" id="GridMain"></div>
+    </div>
+<style>
+
+    #GridMain{
+        width:100% !important;
+    }
+
+</style>
+
+<script>
+    var gridMain;
+    var sku;
+    var colCur = [];
+    var routeCode = "{{Route}}";
+    var modifyValue = false;
+
+    window.addEventListener('beforeunload', function (e) {
+        if(modifyValue ) {
+            e.returnValue = 'Sure';
+            e.preventDefault();
+            return 'Sure?';
+        }
+    });
+
+    var doOnLoad = () => {
+
+        $("#navRight").html(`<button class="btn btn-outline-success my-2 my-sm-0" style="height: calc(1.2em + 0.75rem + 2px) !important;float: right !important;" onClick="saveDataGrid()">Save</button>`)
+
+        let iSorting = 0;
+        let dataEmpty = [];
+        let colID = ["SOL"]
+        let colType = ["ed"];
+        let colColor = ["yellow"];
+        let colInitWidth = ["100"];
+        let colMinWidth = ["50"];
+        let colAlign = ["center"];
+        let colHeader = [0];
+        let colHeader1 = [""];
+        let colHeader2 = [""];
+        let colHeader2C = [""];
+        let colHeader3 = [""];
+        let colHeader3C = [""];
+        let colHeader4 = [""];
+        let colHeader4C = [""];
+        let colHeader5 = ["Xác nhận Clean Line"];
+        let colHeader5C = [""];
+
+        let dtLoad = AjaxAsync("api/report_area/GetDataNew/",{
+            "ID_JOB":"{{ID_JOB}}"
+        },"GET", "JSON");
+        if(dtLoad.code == undefined) {
+            alert("Không tìm thấy đơn");
+        }
+
+        let dataHeader = dtLoad.output.HEADER;
+        sku = dtLoad.output.SKU;
+
+        let jobJacket = dtLoad.output.JOBJACKET;
+        $("#ID").html(jobJacket["ID"]);
+        $("#SO").html(jobJacket["SOLINE"]);
+
+
+        if(!isNaN(sku)) sku = parseInt(sku);
+        else sku = 20;
+        dataHeader.forEach( (v,i) => {
+            if(v.PROCESS_CODE == "SO") iSorting = 1 + i*2;
+            colAlign.push("center");
+            colAlign.push("center");
+
+            dataEmpty.push("");
+            dataEmpty.push("");
+
+            colID.push(v.PROCESS_CODE + "_A");
+            colID.push(v.PROCESS_CODE + "_B");
+
+            colHeader2C.push("");
+            colHeader2C.push("");
+
+            colHeader3C.push("");
+            colHeader3C.push("");
+            
+            colHeader.push("_");
+            colHeader.push(v.PROCESS_CODE);
+
+            {{!-- colHeader.push(colHeader.length);
+            colHeader.push(colHeader.length); --}}
+
+            colHeader1.push("#cspan");
+            colHeader1.push("#cspan");
+            
+            colHeader2.push("#cspan");
+            colHeader2.push("#cspan");
+            
+            colHeader3.push("#cspan");
+            colHeader3.push("#cspan");
+            
+            colHeader4.push(v.VN_NAME);
+            colHeader4.push("#cspan");
+            
+            colHeader5.push("Clean Line");
+            colHeader5.push("Trưởng trạm xác nhận");
+
+            colInitWidth.push("40");
+            colInitWidth.push("*");
+
+            colMinWidth.push("40");
+            colMinWidth.push("90");
+
+            if(v.PROCESS_CODE == routeCode) {
+                colType.push("ch");
+                colType.push("ed");
+
+                colColor.push("#d5e1ff");
+                colColor.push("#d5f1ff");
+
+                colCur.push(colHeader.length - 1);
+                colCur.push(colHeader.length - 2);
+
+                colHeader4C.push("color:red");
+                colHeader4C.push("color:red");
+                colHeader5C.push("color:red");
+                colHeader5C.push("color:red");
+            } else {
+                colType.push("ch");
+                colType.push("ro");
+
+                colColor.push("");
+                colColor.push("");
+                
+                colHeader4C.push("");
+                colHeader4C.push("");
+                colHeader5C.push("");
+                colHeader5C.push("");
+            }
+
+        })
+        
+        colHeader1[1] = "<b>Đối với UQ và GU: Xác nhận clear SOL và SKU trên tất cả công đoạn</b>";
+        colHeader2[1] = "<b>Đối với RBO khác: Xác nhận clear SOL từ In > Bóc tách</b>";
+        colHeader2C[1] = "text-align:center;background:yellow";
+        colHeader3[1] = "<b>Đối với Muji combo: Xác nhận clear SOL từ In > Bóc tách</b>";
+        colHeader3C[1] = "text-align:center;background:#00FFF0";
+        if(iSorting == 0) iSorting = Math.round((dataHeader.length + 2)/2);
+        colHeader2[iSorting] = "<b>Đối với RBO khác: Xác nhận clear SOL từ Sorting > Đóng gói</b>";
+        colHeader3[iSorting] = "<b>Đối với Muji combo: Xác nhận clear SOL và SKU từ Sorting > Đóng gói</b>";
+        
+        colHeader2C[iSorting] = "text-align:center;background:lime";
+        colHeader3C[iSorting] = "text-align:center;background:#0E1F00;color:white";
+
+        console.log(colHeader);
+
+    
+        colID.forEach((id) => {
+            if(id.split('_')[0] == "{{Route}}") {
+                colType.push("ed");
+                colColor.push("#d5f1ff");
+            }
+            else {
+                colType.push("ro");
+                colColor.push("");
+            }
+        })
+
+        gridMain = new dhtmlXGridObject('GridMain');
+        gridMain.setImagePath("/dhtmlx/skins/web/imgs/");
+        gridMain.setHeader(colHeader.join(","));
+        gridMain.attachHeader(colHeader1.join(","),["text-align:center"]);
+        {{!-- gridMain.attachHeader(colHeader2.join(","), colHeader2C);
+        gridMain.attachHeader(colHeader3.join(","), colHeader3C); --}}
+        gridMain.attachHeader(colHeader4.join(","), colHeader4C);
+        gridMain.attachHeader(colHeader5.join(","), colHeader5C);
+        gridMain.setColumnColor(colColor.join(","));
+        gridMain.setColumnIds(colID.join(","));
+        gridMain.setColTypes(colType.join(","));
+        gridMain.setInitWidths(colInitWidth.join(","));
+        gridMain.setColumnMinWidth(colMinWidth.join(","));
+        gridMain.setColAlign(colAlign.join(","));
+
+        gridMain.setStyle(
+            "text-align:center;font-weight:bold;",
+            "","background: blanchedalmond",""
+        );
+        gridMain.enableBlockSelection(true); 
+        gridMain.init();
+        
+        //gridMain.detachHeader(0);
+        gridMain.addRow("ID_JOB",["SOLINE"].concat(dataEmpty));
+        gridMain.addRow("SKU",["SKU"]);
+        gridMain.setRowColor("SKU","black");
+        gridMain.setCellTextStyle("SKU",0,"color:white;border:1px solid gray;font-weight:bold");
+        //gridMain.setColumnHidden(0,true);
+        gridMain.splitAt(1);
+
+        let n = 1;
+        while (n <= sku) {
+            gridMain.addRow(n,[n, n < 10 ? n : ""].concat(dataEmpty));
+            n++;
+        }
+
+    
+
+        let dtGrid = dtLoad.output.DATA;
+            dtGrid.forEach((r,i) => {
+                let colID = gridMain.getColIndexById(`${r.route_step}_${r.confirm}`);
+                try {
+                    gridMain.cells(r.seq, colID).setValue(r.value);
+                    gridMain.cells(r.seq, 0).setValue(r.sku);
+                } catch {
+
+                }
+                
+            });
+
+        gridMain.attachEvent("onEditCell", function(stage,rId,cInd,nValue,oValue){
+            if (stage==1 && this.editor){
+                this.editor.obj.select();
+            }
+            return true;
+        });
+
+        gridMain.attachEvent("onCheck", function(rId,cInd,state){
+            let idColumn = gridMain.getColumnId(cInd);
+            let cellValue = this.cells(rId, cInd).getValue()
+            if(idColumn == routeCode + "_A") {
+                modifyValue = true;
+                if(rId == "ID_JOB") {
+                    if(cellValue == 1) {
+                        let unCheck = false;
+                        for(let i = 2; i < this.getRowsNum(); i++) if(this.cells2(i, cInd).getValue() == 0) unCheck = true;
+                        if(unCheck && !confirm("Còn sót SKU chưa Clear, có muốn tiếp tục hay không?"))
+                            this.cells(rId, cInd).setValue(0);
+                        else 
+                            this.cells(rId, cInd + 1).setValue(localStorage.getItem("NTID"));
+                    } else this.cells(rId, cInd + 1).setValue(localStorage.getItem("NTID"));
+                } else this.cells(rId, cInd + 1).setValue(localStorage.getItem("NTID"));
+            } else {
+                if(cellValue == 1) this.cells(rId, cInd).setValue(0);
+                else this.cells(rId, cInd).setValue(1);
+            }
+        });
+
+        gridMain.attachEvent("onKeyPress", function(code,cFlag,sFlag){
+            var LastRow = this.getRowsNum();
+            if(this.getSelectedBlock() == null) return;
+            var top_row = this.getSelectedBlock().LeftTopRow;
+            var IndexRow = top_row;
+            if(typeof top_row == "string") IndexRow = this.getRowIndex(top_row);
+            var bottom_row = this.getSelectedBlock().RightBottomRow;
+            var left_column = this.getSelectedBlock().LeftTopCol;
+            var right_column = this.getSelectedBlock().RightBottomCol;
+            if(cFlag && code == 83) {
+                saveDataGrid();
+            } else if(!this.editor && (!cFlag) && ((code > 64 && code < 91) || (code > 47 && code < 58)) || code == 113 || (code >= 96 && code <= 105)) { // Any Key
+                if(typeof top_row == "string") this.editCell(); 
+                else this.editCell();
+                return false;
+            } else if(!cFlag && !sFlag && code == 13) { //Enter
+                if(IndexRow + 1 == LastRow) return;
+                this.selectCell(IndexRow + 1,left_column,false,false,false,true);
+                return false;
+            } else if(!cFlag && !sFlag && code == 38) { //Up
+                if(IndexRow - 1 < 0) return;
+                this.selectCell(IndexRow - 1,left_column,false,false,false,true);
+                return false;
+            } else if(!cFlag && !sFlag && code == 40) { //Down
+                if(IndexRow + 1 == LastRow) return;
+                this.selectCell(IndexRow + 1,left_column,false,false,false,true);
+                return false;
+            } else if((!cFlag && !sFlag && code == 39) || (!sFlag && code == 9)) { //Right
+                if(left_column + 1 > this.getColumnsNum()) return;
+                if(this.editor && this.editor.obj.selectionEnd != this.editor.obj.value.length && this.editor.obj.value.length != 0) return true;
+                else {
+                    this.selectCell(IndexRow,left_column + 1,false,false,false,true);
+                    return false;
+                }
+            } else if((!cFlag && !sFlag && code == 37) || (sFlag && code == 9)) { //Left
+                if(left_column - 1 < 0) return;
+                if(this.editor && this.editor.obj.selectionEnd != 0) return true;
+                else {
+                    this.selectCell(IndexRow,left_column - 1,false,false,false,true);
+                    return false;
+                }
+                return false;
+            } else if(!cFlag && !sFlag && code == 46) { //Del
+                    if(typeof top_row == "string") {
+                        this.cells(top_row,left_column).setValue("");
+                    } else { 
+                        for(var i = top_row; i <= bottom_row; i++){
+                            for(var j = left_column; j <= right_column; j++) {
+                                this.cells2(i,j).setValue("");
+                            }
+                        }
+                    }
+                return true;
+            } else if(!cFlag && sFlag && code == 46) { //Shift + Del
+                    if(typeof top_row == "string") {
+                        this.deleteRow(top_row);
+                    } else {
+                        for(var i = bottom_row; i >= top_row; i--){
+                            this.deleteRow(this.getRowId(i));
+                        }
+                    }
+                return true;
+            }  else if(cFlag && !sFlag && code == 68) { //Ctrl + D
+                for(var i = top_row + 1; i <= bottom_row; i++){
+                    for(var j = left_column; j <= right_column; j++) {
+                        this.cells2(i,j).setValue(this.cells2(top_row,j).getValue());
+                    }
+                }
+            } else if(cFlag && !sFlag && code == 67) { //Copy
+                var DataCB = [];
+                var DataCB1 = [];
+                if(typeof top_row == "string") {
+                    DataCB = this.cells(top_row,left_column).getValue() + "\n";
+                    copyTextToClipboard(DataCB);
+                    this.SelectCellEditor();
+                } else {
+                    for(var i = top_row; i <= bottom_row; i++){
+                        for(var j = left_column; j <= right_column; j++) {
+                            DataCB1.push(this.cells2(i,j).getValue().replace("\n",""));
+                        }
+                        if(DataCB1 != "") DataCB.push(DataCB1.join("\t"));
+                        DataCB1 = [];
+                    }
+                    copyTextToClipboard(DataCB.join("\r\n"));
+                }
+                return true;
+            } else if(cFlag && !sFlag && code == 86) { //Paste
+                // if(!this.editor) this.AddClipBoard();
+                // return true;
+                this.pasteBlockFromClipboard();
+            }
+            return true;
+        });
+
+    }
+
+    var saveDataGrid = () => {
+        gridMain.SaveData(colCur);
+        alert("Lưu dữ liệu thành công");
+    }
+
+    dhtmlXGridObject.prototype.SaveData = (col) => {
+        console.log(col);
+        let dataSend = [];
+        gridMain.forEachRow((id) => {
+            let seq, sku, route, val;
+            let routeValue = [];
+            sku = gridMain.cells(id,0).getValue();
+            if(sku != undefined && sku != "") {
+                seq = id;
+                if(seq != "SKU") {
+                    col.forEach((c) => {
+                        route = gridMain.getColumnId(c).split('_');
+                        val = gridMain.cells(id,c).getValue();
+                        if(route.length == 2) {
+                            routeValue.push({
+                                "ROUTE": route[0],
+                                "CONFIRM": route[1],
+                                "VALUE": val
+                            })
+                        }
+                    })
+
+                    dataSend.push({
+                        "SEQ" : seq,
+                        "SKU" : sku,
+                        "DATA" : routeValue
+                    });
+                }
+            }
+        })
+
+        let result = AjaxAsync("api/report_area/SaveReport/",{
+            "ROUTE":"{{Route}}",
+            "ID_JOB":"{{ID_JOB}}",
+            "DATA":dataSend
+        },"POST", "JSON");
+    }
+</script>

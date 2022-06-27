@@ -1,0 +1,311 @@
+
+
+
+    <div style="width:100%;height:100%;overflow: auto;" id="bodyMain">
+       <div style="width:100%;height: 30px; background:rgb(0, 0, 0); color:white;font-size:15pt;" id="HeaderBody">
+            <div style="text-align:center;float:left;width:calc(100% - 110px);line-height:1.2;font-weight:bold">
+                Prepress Upload
+            </div>
+        </div>
+        
+        <div style="width:100%;height: calc(100% - 75px); background:blanchedalmond;margin-top:5px" id="LayoutMain"></div>
+        <div style="width:100%;height: 30px; background:rgb(255, 255, 255); color:rgb(0, 0, 0);font-size:15pt;margin-top:5px;margin-bottom:5px" id="HeaderBody">
+            <div style="float:left;width:500px;height:100%;line-height:1.2">
+                SOLINE <input id="SOLINE"/>
+            </div>
+            <div style="text-align:center;float:right;width:600px;height:100%;line-height:1.2;color:black;background:rgb(255, 255, 255);margin-left:5px">
+                <form id="uploadAll" enctype="multipart/form-data"  method="post">
+                    <input type="text" id="SOLINE" style="visibility: hidden;display: none;"/>
+                    <input type="text" id="NTID" style="visibility: hidden;display: none;"/>
+                    <input type="text" id="TYPE" style="visibility: hidden;display: none;"/>
+                    <input type="file" id="file" name="file"/>
+                    <input type="button" onClick="uploadFile()" value="Upload File"/>
+                </form>
+            </div>
+            <div style="text-align:center;float:right;width:200px;height:100%;line-height:1.2;color:white;background:rgb(104, 0, 0);margin-left:5px">
+                <button style="width:100%;height:100%" onClick="selectAll()">Select All</button>
+            </div>
+        </div>
+    </div>
+<style>
+
+    #GridMain{
+        width:100% !important;
+    }
+
+</style>
+
+<script>
+    var gridAW, gridLayout, gridGPM;
+    var layoutMain, tabbarMain;
+    var sku;
+    var colCur = [];
+    var routeCode = "{{Route}}";
+    var modifyValue = false;
+
+    window.addEventListener('beforeunload', function (e) {
+        if(modifyValue ) {
+            e.returnValue = 'Sure';
+            e.preventDefault();
+            return 'Sure?';
+        }
+    });
+
+    var selectAll = ()=> {
+        let soline = [];
+        let type = "";
+        if(tabbarMain.getActiveTab() == "a3") {
+            gridGPM.checkAll(true);
+        } else  if(tabbarMain.getActiveTab() == "a2") {
+            gridLayout.checkAll(true);
+        } else  if(tabbarMain.getActiveTab() == "a1") {
+            gridAW.checkAll(true);
+        } 
+    }
+
+
+    var uploadFile = ()=> {
+        let soline = [];
+        let type = "";
+        if(tabbarMain.getActiveTab() == "a3") {
+            gridGPM.forEachRow(id => {
+                if(gridGPM.cells(id,0).getValue() == 1) soline.push(gridGPM.cells(id,2).getValue());
+            })
+            type = "GPM";
+        } else  if(tabbarMain.getActiveTab() == "a2") {
+            gridLayout.forEachRow(id => {
+                if(gridLayout.cells(id,0).getValue() == 1) soline.push(gridLayout.cells(id,2).getValue());
+            })
+            type = "LAYOUTSTEPPING";
+        } else  if(tabbarMain.getActiveTab() == "a1") {
+            gridAW.forEachRow(id => {
+                if(gridAW.cells(id,0).getValue() == 1) soline.push(gridAW.cells(id,2).getValue());
+            })
+            type = "ARTWORK";
+        } 
+        
+        $.ajax( {
+            url: urlServerSide + "api/prepressUpload/UploadFile?SOLINE=" + soline.join("|") + "&TYPE=" + type + "&NTID=" + localStorage.getItem("NTID"),
+            type: 'POST',
+            data: new FormData( $("#uploadAll")[0] ),
+            processData: false,
+            contentType: false,
+            success: function(result){
+                alert("Đã upload thành công")
+                if(tabbarMain.getActiveTab() == "a3") {
+                    gridGPM.forEachRow(id => {
+                        if(gridGPM.cells(id,0).getValue() == 1) {
+                            let dtSoline = AjaxAsync("api/prepressUpload/GetData/",{
+                                    "SOLINE":id,
+                                    "TYPE": "GPM"
+                                },"GET", "JSON");
+                            let arrayLoad = [];
+                            dtSoline.output.forEach(v => {
+                                arrayLoad.push("<div id='" + v.id + "' style='width:100%'><button style='color:red' onClick='deleteFile(\"" + v.id + "\")'>Delete</button> - " + "Filename: " + v.namefile + ", upload by: " + v.uploadby + ", upload date: " + v.uploaddate + "</div>")
+                            })
+                            gridGPM.cells(id,4).setValue(arrayLoad.join(""));                                
+                        }
+                    })
+                } else  if(tabbarMain.getActiveTab() == "a2") {
+                    gridLayout.forEachRow(id => {
+                        if(gridLayout.cells(id,0).getValue() == 1) {
+                            let dtSoline = AjaxAsync("api/prepressUpload/GetData/",{
+                                    "SOLINE":id,
+                                    "TYPE": "LAYOUTSTEPPING"
+                                },"GET", "JSON");
+                            let arrayLoad = [];
+                            dtSoline.output.forEach(v => {
+                                arrayLoad.push("<div id='" + v.id + "' style='width:100%'><button style='color:red' onClick='deleteFile(\"" + v.id + "\")'>Delete</button> - " + "Filename: " + v.namefile + ", upload by: " + v.uploadby + ", upload date: " + v.uploaddate + "</div>")
+                            })
+                            gridLayout.cells(id,4).setValue(arrayLoad.join(""));                                
+                        }
+                    })
+                } else  if(tabbarMain.getActiveTab() == "a1") {
+                    gridAW.forEachRow(id => {
+                        if(gridAW.cells(id,0).getValue() == 1) {
+                            let dtSoline = AjaxAsync("api/prepressUpload/GetData/",{
+                                    "SOLINE":id,
+                                    "TYPE": "ARTWORK"
+                                },"GET", "JSON");
+                            let arrayLoad = [];
+                            dtSoline.output.forEach(v => {
+                                arrayLoad.push("<div id='" + v.id + "' style='width:100%'><button style='color:red' onClick='deleteFile(\"" + v.id + "\")'>Delete</button> - " + "Filename: " + v.namefile + ", upload by: " + v.uploadby + ", upload date: " + v.uploaddate + "</div>")
+                            })
+                            gridAW.cells(id,4).setValue(arrayLoad.join(""));                                
+                        }
+                    })
+                } 
+            }
+        } );
+    }
+
+    var soLineInput = document.getElementById("SOLINE");
+
+    var deleteFile = id => {
+        let dtLoad = AjaxAsync("api/prepressUpload/DeleteFile/",{
+            "ID":id
+        },"POST", "JSON");
+        if(dtLoad.code == 200) {
+            $("#" + id).css("display","none");
+        }
+        alert(dtLoad.mess);
+    }
+    var deleteSOLine = (soLine,type) => {
+        let dtLoad = AjaxAsync("api/prepressUpload/DeleteFileAll/",{
+            "SOLINE":soLine,
+            "TYPE":type
+        },"POST", "JSON");
+        if(dtLoad.code == 200) {
+            if(type == "GPM") gridGPM.cells(soLine,4).setValue("");
+            else if(type == "LAYOUTSTEPPING") gridLayout.cells(soLine,4).setValue("");
+            else if(type == "ARTWORK") gridAW.cells(soLine,4).setValue("");
+        }
+        alert(dtLoad.mess);
+    }
+
+
+    // Execute a function when the user presses a key on the keyboard
+    soLineInput.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+
+            let index = gridAW.getRowIndex(soLineInput.value);
+            if(index != -1) {
+                alert("SOLine đã tồn tại");
+                return;
+            }
+
+            let dtLoad = AjaxAsync("api/prepressUpload/GetData/",{
+                "SOLINE":soLineInput.value
+            },"GET", "JSON");
+            if(dtLoad.code == undefined) {
+                alert("Không tìm thấy đơn");
+            }
+
+
+
+            let arrAW = [];
+            let arrLayout = [];
+            let arrGPM = [];
+
+            dtLoad.output.forEach(v => {
+                if(v.typedocument == "LAYOUTSTEPPING") arrLayout.push("<div id='" + v.id + "' style='width:100%'><button style='color:red' onClick='deleteFile(\"" + v.id + "\")'>Delete</button> - " + "Filename: " + v.namefile + ", upload by: " + v.uploadby + ", upload date: " + v.uploaddate + "</div>");
+                else if(v.typedocument == "ARTWORK") arrAW.push("<div id='" + v.id + "' style='width:100%'><button style='color:red' onClick='deleteFile(\"" + v.id + "\")'>Delete</button>" + " - Filename: " + v.namefile + ", upload by: " + v.uploadby + ", upload date: " + v.uploaddate + "</div>")
+                else if(v.typedocument == "GPM") arrGPM.push("<div id='" + v.id + "' style='width:100%'><button style='color:red' onClick='deleteFile(\"" + v.id + "\")'>Delete</button>" + " - Filename: " + v.namefile + ", upload by: " + v.uploadby + ", upload date: " + v.uploaddate + "</div>")
+            })
+            
+            gridAW.addRow(soLineInput.value,[0,gridAW.getRowsNum() + 1,soLineInput.value,`<div id="formA` + soLineInput.value + `" style="width:100%;height:100%;"></div>`,arrAW.join(""),"<button onClick='deleteSOLine(\"" + soLineInput.value + "\",\"ARTWORK\")'>Delete<br/>All</button>"]);
+            this["formA" + soLineInput.value] = new dhtmlXForm("formA" + soLineInput.value, [
+                {type: "upload", name: "files", multiple: true, autoRemove: true, inputWidth: 300, autoStart: true, url: urlServerSide + "api/prepressUpload/UploadFile?SOLINE=" + soLineInput.value + "&TYPE=ARTWORK&NTID=" + localStorage.getItem("NTID")},
+                {type: "label", name:"SOL", label: soLineInput.value, hidden: true}
+            ]);
+
+            this["formA" + soLineInput.value].attachEvent("onUploadFile",function(realName, serverName){
+				console.log("<b>onUploadFile</b>, AMB real name: "+realName+", server name: "+serverName);
+                let soLine = this.getItemLabel("SOL");
+                let dtSoline = AjaxAsync("api/prepressUpload/GetData/",{
+                    "SOLINE":soLine,
+                    "TYPE": "ARTWORK"
+                },"GET", "JSON");
+                let arrayLoad = [];
+                dtSoline.output.forEach(v => {
+                    arrayLoad.push("<div id='" + v.id + "' style='width:100%'><button style='color:red' onClick='deleteFile(\"" + v.id + "\")'>Delete</button> - " + "Filename: " + v.namefile + ", upload by: " + v.uploadby + ", upload date: " + v.uploaddate + "</div>")
+                });
+                gridAW.cells(soLine,4).setValue(arrayLoad.join(""));
+			});
+
+            gridLayout.addRow(soLineInput.value, [0,gridLayout.getRowsNum() + 1,soLineInput.value,`<div id="formB` + soLineInput.value + `" style="width:100%;height:100%;"></div>`,arrLayout.join(""),"<button onClick='deleteSOLine(\"" + soLineInput.value + "\",\"LAYOUTSTEPPING\")'>Delete<br/>All</button>"]);
+            this["formB" + soLineInput.value] = new dhtmlXForm("formB" + soLineInput.value, [
+                {type: "upload", name: "files", multiple: true, autoRemove: true, inputWidth: 300, autoStart: true, url: urlServerSide + "api/prepressUpload/UploadFile?SOLINE=" + soLineInput.value + "&TYPE=LAYOUTSTEPPING&NTID=" + localStorage.getItem("NTID")},
+                {type: "label", name:"SOL", label: soLineInput.value, hidden: true}
+            ]);
+            
+            this["formB" + soLineInput.value].attachEvent("onUploadFile",function(realName, serverName){
+				console.log("<b>onUploadFile</b>, MMG real name: "+realName+", server name: "+serverName);
+                let soLine = this.getItemLabel("SOL");
+                let dtSoline = AjaxAsync("api/prepressUpload/GetData/",{
+                    "SOLINE":soLine,
+                    "TYPE": "LAYOUTSTEPPING"
+                },"GET", "JSON");
+                let arrayLoad = [];
+                dtSoline.output.forEach(v => {
+                    arrayLoad.push("<div id='" + v.id + "' style='width:100%'><button style='color:red' onClick='deleteFile(\"" + v.id + "\")'>Delete</button> - " + "Filename: " + v.namefile + ", upload by: " + v.uploadby + ", upload date: " + v.uploaddate + "</div>")
+                });
+                gridLayout.cells(soLine,4).setValue(arrayLoad.join(""));
+			});
+            
+            gridGPM.addRow(soLineInput.value, [0,gridGPM.getRowsNum() + 1,soLineInput.value,`<div id="formC` + soLineInput.value + `" style="width:100%;height:100%;"></div>`,arrGPM.join(""),"<button onClick='deleteSOLine(\"" + soLineInput.value + "\",\"GPM\")'>Delete<br/>All</button>"]);
+            this["formC" + soLineInput.value] = new dhtmlXForm("formC" + soLineInput.value, [
+                {type: "upload", name: "files", multiple: false, autoRemove: true, inputWidth: 300, autoStart: true, url: urlServerSide + "api/prepressUpload/UploadFile?SOLINE=" + soLineInput.value + "&TYPE=GPM&NTID=" + localStorage.getItem("NTID")},
+                {type: "label", name:"SOL", label: soLineInput.value, hidden: true}
+            ]);
+            
+            this["formC" + soLineInput.value].attachEvent("onUploadFile",function(realName, serverName){
+				console.log("<b>onUploadFile</b>, PGM real name: "+realName+", server name: "+serverName);
+                let soLine = this.getItemLabel("SOL");
+                let dtSoline = AjaxAsync("api/prepressUpload/GetData/",{
+                    "SOLINE":soLine,
+                    "TYPE": "GPM"
+                },"GET", "JSON");
+                let arrayLoad = [];
+                dtSoline.output.forEach(v => {
+                    arrayLoad.push("<div id='" + v.id + "' style='width:100%'><button style='color:red' onClick='deleteFile(\"" + v.id + "\")'>Delete</button> - " + "Filename: " + v.namefile + ", upload by: " + v.uploadby + ", upload date: " + v.uploaddate + "</div>")
+                });
+                gridGPM.cells(soLine,4).setValue(arrayLoad.join(""));
+			});
+
+            soLineInput.value = "";
+        }
+    });
+    
+
+    var doOnLoad = () => {
+        tabbarMain = new dhtmlXTabBar("LayoutMain");
+        tabbarMain.addTab("a1", "Artwork 100%");
+        tabbarMain.addTab("a2", "Layout Stepping");
+        tabbarMain.addTab("a3", "GPM File", null, null, true);
+
+        gridAW = tabbarMain.tabs("a1").attachGrid();
+        gridAW.setImagePath("/dhtmlx/skins/web/imgs/");
+        gridAW.setHeader(",NO,SOLINE,UPLOAD FILE,FILE UPLOADED,");
+        gridAW.setColTypes("ch,ro,ed,ro,ed,ro");
+        gridAW.setInitWidths("30,50,150,355,*,60");
+        gridAW.setColumnMinWidth("30,50,150,100,150,50");
+        gridAW.setColAlign("center,center,center,center,left,center");
+        gridAW.setStyle(
+            "text-align:center;font-weight:bold;",
+            "height:50px","background: blanchedalmond",""
+        );
+        gridAW.init();
+
+
+        gridLayout = tabbarMain.tabs("a2").attachGrid();
+        gridLayout.setImagePath("/dhtmlx/skins/web/imgs/");
+        gridLayout.setHeader(",NO,SOLINE,UPLOAD FILE,FILE UPLOADED,");
+        gridLayout.setColTypes("ch,ro,ed,ro,ed,ro");
+        gridLayout.setInitWidths("30,50,150,355,*,60");
+        gridLayout.setColumnMinWidth("30,50,150,100,150,50");
+        gridLayout.setColAlign("center,center,center,center,left,center");
+        gridLayout.setStyle(
+            "text-align:center;font-weight:bold;",
+            "height:50px","background: blanchedalmond",""
+        );
+        gridLayout.init();
+
+
+        gridGPM = tabbarMain.tabs("a3").attachGrid();
+        gridGPM.setImagePath("/dhtmlx/skins/web/imgs/");
+        gridGPM.setHeader(",NO,SOLINE,UPLOAD FILE,FILE UPLOADED,");
+        gridGPM.setColTypes("ch,ro,ed,ed,ed,ro");
+        gridGPM.setInitWidths("30,50,150,355,*,60");
+        gridGPM.setColumnMinWidth("30,50,150,100,150,50");
+        gridGPM.setColAlign("center,center,center,center,left,center");
+        gridGPM.setStyle(
+            "text-align:center;font-weight:bold;",
+            "height:50px","background: blanchedalmond",""
+        );
+        gridGPM.init();
+        tabbarMain.goToPrevTab();
+        tabbarMain.goToPrevTab();
+    }
+</script>

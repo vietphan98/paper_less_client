@@ -1,0 +1,442 @@
+<div>
+    <script>
+        var LayoutMain ;
+        var ToolbarMain ;
+        var GridMain,GridItem,Grid_KL01,Grid_KL02,Grid_KL03 ;
+      // var URI = 'http://localhost:80/api/AutoPlan_Test'
+
+        var URI = 'http://147.121.56.228:80/api/AutoPlan_Test'
+        function doOnLoad(){
+
+                LayoutMain = new dhtmlXLayoutObject({
+                            parent: document.body,
+                            pattern : "5C",
+                            cells : [
+                                        {id: "a", header: true,text: "Inlay Scheduling"}, 
+                                        {id: "b", header: true,text: "Unable Item",width: 350}, 
+                                        {id: "c", header: true, text: "KL01"}, 
+                                        {id: "d", header: true, text: "KL02"}, 
+                                        {id: "e", header: true , text: "KL03"}, 
+                            ],
+                            offsets: {          // optional, offsets for fullscreen init
+                                top:    50,     // you can specify all four sides
+                                right:  10,     // or only the side where you want to have an offset
+                                bottom: 10,
+                                left:   10
+                            }
+                })
+                InitToolbar();
+                InitGridMain();
+                InitGridItem();
+                InitToolbarItem();
+                InitGirdKL01();
+                InitGirdKL02();
+                InitGirdKL03();
+
+        }
+        function InitToolbar(){
+               ToolbarMain = LayoutMain.cells('a').attachToolbar({
+                icons_path: "/dhtmlx/common/imgs/",
+                align: "left",
+                })
+                ToolbarMain.addText("Title",null,"Auto Scheduling Test");
+                ToolbarMain.addButton("SaveData",null,"Save Data","save_as.gif");
+                ToolbarMain.addButton("LoadData",null,"Get Data","save_as.gif");
+                ToolbarMain.addButton("Apply",null,"Apply Cal","save_as.gif");
+                ToolbarMain.addButton("LoadDataCal",null,"Load Data Cal","save_as.gif");
+                ToolbarMain.addButton("Delete",null,"REWORK TEST DELETE ALL","save_as.gif");
+
+
+
+                ToolbarMain.attachEvent("onClick",function(name){
+                    if(name == "SaveData"){
+                        var DataSend = [];
+                         var Column = "po,so_line,order_item,oracle_item,rbo,qty,ups,sku,printing_size,inlay_position,inlay_code,needed_inlay_quantity,basesheet_code,needed_basesheet_quantity,inlay_status,basesheet_status,rm_status,wip_status,po_readiness,lasted_plan_time,adjusted_lasted_plan_time,service_priority,due_date,quantity_sheet,quantity_already_ran_sheet,quantity_need_to_run_sheet,service_risk,setup_time,run_time,total_needed_time,estimated_finish_time,po_note,machine,position_in_machine,time_in,time_out";
+                        for(var i = 0; i < GridMain.getRowsNum();i++){
+                            if(GridMain.cells2(i,1).getValue() != ""){
+                                var ArrAdd = [];
+                                for(var j = 1 ; j < GridMain.getColumnsNum();j++){
+                                    ArrAdd.push(GridMain.cells2(i,j).getValue().replace("'","''"));
+                                }
+                                DataSend.push(ArrAdd);
+
+                            }
+                        }
+                        dhtmlx.confirm({
+                            type: "confirm-warning",
+                            text : "Do you want to save data?",
+                            callback: function(){
+                                var DataTable = {"TOKEN_KEY" : "SAVEDATA"};
+                                DataTable.DATA = JSON.stringify(DataSend);
+                                DataTable.COLUMN = Column ;
+                                var Result = AjaxAsync(`${URI}`,DataTable,"POST","JSON");
+                                if(Result === "OK"){
+                                    dhtmlx.alert("Successfully added data");
+                                   
+                                }else{
+                                    dhtmlx.alert("An error occurred during the process");
+                                }
+                            }
+                        })
+                    }else if(name == "Apply"){
+                                var Result = AjaxAsync(`${URI}`,{"TOKEN_KEY" : "MODULE_5_CAL"},"POST","JSON");
+                                if(Result === "DONE"){
+                                    dhtmlx.message({ 
+                                    type:"alert-warning", 
+                                    text:"Tính toán thành công , Vui lòng load dữ liệu để xem kết quả"
+                                });
+                                }
+
+                    }else if(name == "LoadDataCal"){
+                            var Result_1 = AjaxAsync(`${URI}`,{"TOKEN_KEY" : "KLO1_LOAD"},"POST","HTML")
+                            Grid_KL01.parse(Result_1)
+                            var Result_2 = AjaxAsync(`${URI}`,{"TOKEN_KEY" : "KLO2_LOAD"},"POST","HTML")
+                            Grid_KL02.parse(Result_2)
+                            var Result_3 = AjaxAsync(`${URI}`,{"TOKEN_KEY" : "KLO3_LOAD"},"POST","HTML")
+                            Grid_KL03.parse(Result_3)
+                    }else if(name == "LoadData" ){
+                          var Result_1 = AjaxAsync(`${URI}`,{"TOKEN_KEY" : "LOADDATA"},"POST","HTML")
+                                 GridMain.clearAll()
+                               GridMain.parse(Result_1)
+                    }else if(name == "Delete"){
+                            GridMain.clearAll()
+                            GridItem.clearAll()
+                            Grid_KL01.clearAll()
+                            Grid_KL02.clearAll()
+                            Grid_KL03.clearAll()
+                         var Result = AjaxAsync(`${URI}`,{"TOKEN_KEY" : "DELETE"},"POST","HTML")
+                             if(Result === "DONE"){
+                                    dhtmlx.message({ 
+                                    type:"alert-error", 
+                                    text:"Đã xóa các dữ liệu , vui lòng input lại dữ liệu"
+                                });
+                                }
+                    }
+                })
+        }
+         function InitToolbarItem(){
+               ToolbarMain = LayoutMain.cells('b').attachToolbar({
+                icons_path: "/dhtmlx/common/imgs/",
+                align: "left",
+                })
+                ToolbarMain.addText("Title",null,"Item Save");
+                ToolbarMain.addButton("SaveData",null,"Save Data","save_as.gif");
+                ToolbarMain.addButton("LoadData",null,"Get Data","save_as.gif");
+
+                ToolbarMain.attachEvent("onClick",function(name){
+                    if(name == "SaveData"){
+                      var DataSend = [] ;
+                       var Column = "kl01,kl02,kl03";
+                       for(var i =0; i <GridItem.getRowsNum();i++){
+                           if(GridItem.cells2(i,1).getValue() != ""){
+                               var ArrAdd = [];
+                               for(var j = 1; j < GridItem.getColumnsNum();j++){
+                                ArrAdd.push(GridItem.cells2(i,j).getValue().replace("'","''"));
+                               }
+                               DataSend.push(ArrAdd);
+                           }
+                       }
+                       dhtmlx.confirm({
+                            type: "confirm-warning",
+                            text : "Do you want to save data?",
+                            callback: function(){
+                                var DataTable = {"TOKEN_KEY" : "SAVEDATA_ITEM"};
+                                DataTable.DATA = JSON.stringify(DataSend);
+                                DataTable.COLUMN = Column ;
+                                var Result = AjaxAsync(`${URI}`,DataTable,"POST","JSON");
+                                if(Result === "OK"){
+                                    dhtmlx.alert("Successfully added data");
+                                     var LoadData =  AjaxAsync(`${URI}`,{"TOKEN_KEY": "LOADDATA"},"POST","JSON")
+                                     GridMain.parse(LoadData)
+                                }else{
+                                    dhtmlx.alert("An error occurred during the process");
+                                }
+                            }
+                        })
+                     
+                    }else if(name == "LoadData"){
+                        var Result_1 = AjaxAsync(`${URI}`,{"TOKEN_KEY" : "ITEM_LOAD"},"POST","HTML")
+                         GridItem.clearAll();
+                            GridItem.parse(Result_1)
+                    }
+                })
+        }
+        function InitGirdKL01(){
+                 Grid_KL01 = LayoutMain.cells("c").attachGrid();
+              Grid_KL01.setHeader("stt,po,inlay_code,estimated_time,total_time_need,,adjust_time,time_out,priority")
+               Grid_KL01.setInitWidths("50,100,100,100,100,100,100,100,100")
+               Grid_KL01.setColAlign("left,left,left,left,left,left,left,left,left")
+               Grid_KL01.setColTypes("ed,ed,ed,ed,ed,ed,ed,ed,ed")
+               Grid_KL01.setColSorting("str,str,str,str,str,str,str,str,str")
+               Grid_KL01.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter")
+                Grid_KL01.init();
+        }
+          function InitGirdKL02(){
+                 Grid_KL02 = LayoutMain.cells("d").attachGrid();
+              Grid_KL02.setHeader("stt,po,inlay_code,estimated_time,total_time_need,,adjust_time,time_out,priority")
+               Grid_KL02.setInitWidths("50,100,100,100,100,100,100,100,100")
+               Grid_KL02.setColAlign("left,left,left,left,left,left,left,left,left")
+               Grid_KL02.setColTypes("ed,ed,ed,ed,ed,ed,ed,ed,ed")
+               Grid_KL02.setColSorting("str,str,str,str,str,str,str,str,str")
+               Grid_KL02.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter")
+                Grid_KL02.init();
+        }
+          function InitGirdKL03(){
+                 Grid_KL03 = LayoutMain.cells("e").attachGrid();
+                Grid_KL03.setHeader("stt,po,inlay_code,estimated_time,total_time_need,,adjust_time,time_out,priority")
+               Grid_KL03.setInitWidths("50,100,100,100,100,100,100,100,100")
+               Grid_KL03.setColAlign("left,left,left,left,left,left,left,left,left")
+               Grid_KL03.setColTypes("ed,ed,ed,ed,ed,ed,ed,ed,ed")
+               Grid_KL03.setColSorting("str,str,str,str,str,str,str,str,str")
+               Grid_KL03.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter")
+              Grid_KL03.init();
+        }
+         function InitGridMain(){
+                GridMain = LayoutMain.cells("a").attachGrid();
+               GridMain.setHeader(",PO,SOLINE,ORDER_ITEM,ORACLE_ITEM,RBO,QTY,UPS,SKU,PRINTING SIZE,INLAY POSITION,INLAY CODE,NEEDED INLAY QUANTITY,Basesheet code,Needed basesheet quantity,Inlay status,Basesheet status,RM status,Wip status,PO# readiness,Lasted plan time,Adjusted lasted plan time,Service-priority#,Due-date,Quantity (sheet),Quantity already ran (sheet),Quantity need to run (sheet),Service risk,Set-up time,Run time,Total needed time,Estimated finish time,PO# Note,Machine,Position in machine,in, out")
+            GridMain.setInitWidths("50,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100");
+            GridMain.setColAlign("left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left");
+            GridMain.setColTypes("ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed");
+            GridMain.setColSorting("str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str");
+            GridMain.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+            GridMain.init();
+
+             for(let i = 1 ; i < 600; i++){
+                GridMain.addRow(i,[i]);
+            }
+            
+            
+            GridMain.attachEvent("onEditCell", function(stage,rId,cInd,nValue,oValue){
+                    if (stage==1 && this.editor && this.editor.obj){
+                        this.editor.obj.select();
+                        }
+                    return true;
+            });
+             GridMain.attachEvent("onKeyPress", function(code,cFlag,sFlag){
+            var LastRow = this.getRowsNum();
+            if(this.getSelectedBlock() == null) return;
+            var top_row = this.getSelectedBlock().LeftTopRow;
+            var IndexRow = top_row;
+            if(typeof top_row == "string") IndexRow = this.getRowIndex(top_row);
+            var bottom_row = this.getSelectedBlock().RightBottomRow;
+            var left_column = this.getSelectedBlock().LeftTopCol;
+            var right_column = this.getSelectedBlock().RightBottomCol;
+            if(!cFlag && !sFlag && code == 13) { //Enter
+                if(IndexRow + 1 == LastRow) return;
+                this.selectCell(IndexRow + 1,left_column,false,false,false,true);
+                return false;
+            } else if(!cFlag && !sFlag && code == 38) { //Up
+                if(IndexRow - 1 < 0) return;
+                this.selectCell(IndexRow - 1,left_column,false,false,false,true);
+                return false;
+            } else if(!cFlag && !sFlag && code == 40) { //Down
+                if(IndexRow + 1 == LastRow) return;
+                this.selectCell(IndexRow + 1,left_column,false,false,false,true);
+                return false;
+            } else if((!cFlag && !sFlag && code == 39) || (!sFlag && code == 9)) { //Right
+                if(left_column + 1 > this.getColumnsNum()) return;
+                if(this.editor && this.editor.obj.selectionEnd != this.editor.obj.value.length && this.editor.obj.value.length != 0) return true;
+                else {
+                    this.selectCell(IndexRow,left_column + 1,false,false,false,true);
+                    return false;
+                }
+            } else if((!cFlag && !sFlag && code == 37) || (sFlag && code == 9)) { //Left
+                if(left_column - 1 < 0) return;
+                if(this.editor && this.editor.obj.selectionEnd != 0) return true;
+                else {
+                    this.selectCell(IndexRow,left_column - 1,false,false,false,true);
+                    return false;
+                }
+                return false;
+            }
+             else if(!cFlag && !sFlag && code == 46) { //Del
+                //     if(typeof top_row == "string") {
+                //        // this.cells(top_row,left_column).setValue("");
+                //        var DataTable = {"EVENT":"DELETECOMBO" , "SOLINE" :this.cells(top_row,0).getValue()};
+                //         var Result = AjaxAsync("Event.php",DataTable,"POST","HTML");
+                //         if(Result == "OK") {
+                //             dhtmlx.alert("Đã xóa SOLINE : " + this.cells(top_row,0).getValue());
+
+                //             GridData.clearAll();
+                //                var Result = AjaxAsync("Event.php", {
+                //               "EVENT": "LOADDATACOMBO"
+                //                 });
+                
+                //               GridData.parse(Result);
+
+                //           }else{
+                //                 GridData.clearAll();
+                //                   var Result = AjaxAsync("Event.php", {
+                //                "EVENT": "LOADDATACOMBO"
+                //                 });
+                
+                //               GridData.parse(Result);
+                //               dhtmlx.alert("Đã xảy ra lỗi, vui lòng kiểm tra lại ");
+                //           }
+                //     } 
+                // return true;
+            }else if(!cFlag && sFlag && code == 46) { //Shift + Del
+                    if(typeof top_row == "string") {
+                        this.deleteRow(top_row);
+                    } else {
+                        for(var i = bottom_row; i >= top_row; i--){
+                            this.deleteRow(this.getRowId(i));
+                        }
+                    }
+                return true;
+            }  else if(cFlag && !sFlag && code == 68) { //Ctrl + D
+                for(var i = top_row + 1; i <= bottom_row; i++){
+                    for(var j = left_column; j <= right_column; j++) {
+                        this.cells2(i,j).setValue(this.cells2(top_row,j).getValue());
+                    }
+                }
+            } else if(!this.editor && (!cFlag) && ((code > 64 && code < 91) || (code > 47 && code < 58)) || code == 113 || (code >= 96 && code <= 105)) { // Any Key
+                if(typeof top_row == "string") this.editCell(); 
+                else this.editCell();
+                return false;
+            } else if(cFlag && !sFlag && code == 67) { //Copy
+                var DataCB = [];
+                var DataCB1 = [];
+                if(typeof top_row == "string") {
+                    DataCB = this.cells(top_row,left_column).getValue() + "\n";
+                    copyTextToClipboard(DataCB);
+                    this.SelectCellEditor();
+                } else {
+                    for(var i = top_row; i <= bottom_row; i++){
+                        for(var j = left_column; j <= right_column; j++) {
+                            DataCB1.push(this.cells2(i,j).getValue().replace("\n",""));
+                        }
+                        if(DataCB1 != "") DataCB.push(DataCB1.join("\t"));
+                        DataCB1 = [];
+                    }
+                    copyTextToClipboard(DataCB.join("\r\n"));
+                }
+                return true;
+                    } else if(cFlag && !sFlag && code == 86) { //Paste
+                        if(!this.editor) this.AddClipBoard();
+                        return true;
+                    }
+                    return true;
+                });
+         }
+        function InitGridItem(){
+            GridItem = LayoutMain.cells("b").attachGrid();
+            GridItem.setHeader("KL01,KL02,KL03");
+            GridItem.setInitWidths("150,150,150")
+            GridItem.setColAlign("left,left,left");
+            GridItem.setColTypes("ed,ed,ed");
+            GridItem.setColSorting("str,str,str");
+            GridItem.attachHeader("#text_filter,#text_filter,#text_filter")
+            GridItem.init();
+            for(let i = 1 ; i < 1000; i++){
+                GridItem.addRow(i,[i]);
+            }
+            GridItem.attachEvent("onKeyPress", function(code,cFlag,sFlag){
+            var LastRow = this.getRowsNum();
+            if(this.getSelectedBlock() == null) return;
+            var top_row = this.getSelectedBlock().LeftTopRow;
+            var IndexRow = top_row;
+            if(typeof top_row == "string") IndexRow = this.getRowIndex(top_row);
+            var bottom_row = this.getSelectedBlock().RightBottomRow;
+            var left_column = this.getSelectedBlock().LeftTopCol;
+            var right_column = this.getSelectedBlock().RightBottomCol;
+            if(!cFlag && !sFlag && code == 13) { //Enter
+                if(IndexRow + 1 == LastRow) return;
+                this.selectCell(IndexRow + 1,left_column,false,false,false,true);
+                return false;
+            } else if(!cFlag && !sFlag && code == 38) { //Up
+                if(IndexRow - 1 < 0) return;
+                this.selectCell(IndexRow - 1,left_column,false,false,false,true);
+                return false;
+            } else if(!cFlag && !sFlag && code == 40) { //Down
+                if(IndexRow + 1 == LastRow) return;
+                this.selectCell(IndexRow + 1,left_column,false,false,false,true);
+                return false;
+            } else if((!cFlag && !sFlag && code == 39) || (!sFlag && code == 9)) { //Right
+                if(left_column + 1 > this.getColumnsNum()) return;
+                if(this.editor && this.editor.obj.selectionEnd != this.editor.obj.value.length && this.editor.obj.value.length != 0) return true;
+                else {
+                    this.selectCell(IndexRow,left_column + 1,false,false,false,true);
+                    return false;
+                }
+            } else if((!cFlag && !sFlag && code == 37) || (sFlag && code == 9)) { //Left
+                if(left_column - 1 < 0) return;
+                if(this.editor && this.editor.obj.selectionEnd != 0) return true;
+                else {
+                    this.selectCell(IndexRow,left_column - 1,false,false,false,true);
+                    return false;
+                }
+                return false;
+            }
+             else if(!cFlag && !sFlag && code == 46) { //Del
+                //     if(typeof top_row == "string") {
+                //        // this.cells(top_row,left_column).setValue("");
+                //        var DataTable = {"EVENT":"DELETECOMBO" , "SOLINE" :this.cells(top_row,0).getValue()};
+                //         var Result = AjaxAsync("Event.php",DataTable,"POST","HTML");
+                //         if(Result == "OK") {
+                //             dhtmlx.alert("Đã xóa SOLINE : " + this.cells(top_row,0).getValue());
+
+                //             GridData.clearAll();
+                //                var Result = AjaxAsync("Event.php", {
+                //               "EVENT": "LOADDATACOMBO"
+                //                 });
+                
+                //               GridData.parse(Result);
+
+                //           }else{
+                //                 GridData.clearAll();
+                //                   var Result = AjaxAsync("Event.php", {
+                //                "EVENT": "LOADDATACOMBO"
+                //                 });
+                
+                //               GridData.parse(Result);
+                //               dhtmlx.alert("Đã xảy ra lỗi, vui lòng kiểm tra lại ");
+                //           }
+                //     } 
+                // return true;
+            }else if(!cFlag && sFlag && code == 46) { //Shift + Del
+                    if(typeof top_row == "string") {
+                        this.deleteRow(top_row);
+                    } else {
+                        for(var i = bottom_row; i >= top_row; i--){
+                            this.deleteRow(this.getRowId(i));
+                        }
+                    }
+                return true;
+            }  else if(cFlag && !sFlag && code == 68) { //Ctrl + D
+                for(var i = top_row + 1; i <= bottom_row; i++){
+                    for(var j = left_column; j <= right_column; j++) {
+                        this.cells2(i,j).setValue(this.cells2(top_row,j).getValue());
+                    }
+                }
+            } else if(!this.editor && (!cFlag) && ((code > 64 && code < 91) || (code > 47 && code < 58)) || code == 113 || (code >= 96 && code <= 105)) { // Any Key
+                if(typeof top_row == "string") this.editCell(); 
+                else this.editCell();
+                return false;
+            } else if(cFlag && !sFlag && code == 67) { //Copy
+                var DataCB = [];
+                var DataCB1 = [];
+                if(typeof top_row == "string") {
+                    DataCB = this.cells(top_row,left_column).getValue() + "\n";
+                    copyTextToClipboard(DataCB);
+                    this.SelectCellEditor();
+                } else {
+                    for(var i = top_row; i <= bottom_row; i++){
+                        for(var j = left_column; j <= right_column; j++) {
+                            DataCB1.push(this.cells2(i,j).getValue().replace("\n",""));
+                        }
+                        if(DataCB1 != "") DataCB.push(DataCB1.join("\t"));
+                        DataCB1 = [];
+                    }
+                    copyTextToClipboard(DataCB.join("\r\n"));
+                }
+                return true;
+            } else if(cFlag && !sFlag && code == 86) { //Paste
+                if(!this.editor) this.AddClipBoard();
+                return true;
+            }
+            return true;
+        });
+        }
+    </script>
+</div>

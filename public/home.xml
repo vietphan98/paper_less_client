@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rows>
+  <head>
+      <column type="ro" >STT</column>
+      <column  type="ro" >NAME</column>
+      <column  type="ro" >version</column>
+      <column type="ro" >LINK</column>
+  </head>
+ 	<row id="1">
+		<cell>1</cell>
+		<cell> Production Record </cell>
+		<cell>v2022.04.09.1</cell>
+		<cell>
+     <![CDATA[<a href="http://147.121.73.4/RFID/ProductionRecord/" 
+      target="popup" 
+      onclick="window.open('http://147.121.73.4/RFID/ProductionRecord/','_blank'); return false;">
+        JOBJACKET 
+    </a>]]>
+    </cell>
+	</row>
+
+  <row id="2">
+		<cell>2</cell>
+		<cell> Dashboard UEE </cell>
+		<cell>v2022.04.09.1</cell>
+		<cell>
+     <![CDATA[<a href="http://appdvn16/DashboardUee" 
+      target="popup" 
+      onclick="window.open('http://appdvn16/DashboardUee','_blank'); return false;">
+        Dashboard UEE 
+    </a>]]>
+    </cell>
+	</row>
+
+  <row id="3">
+		<cell>3</cell>
+		<cell> Dashboard Scrap </cell>
+		<cell>v2022.04.09.1</cell>
+		<cell>
+     <![CDATA[<a href="http://appdvn16/DashboardScrap" 
+      target="popup" 
+      onclick="window.open('http://appdvn16/DashboardScrap','_blank'); return false;">
+        Dashboard Scrap 
+    </a>]]>
+    </cell>
+	</row>
+
+  <row id="4">
+		<cell>4</cell>
+		<cell>  DB SCHEDULING </cell>
+		<cell>v2022.04.09.1</cell>
+		<cell>
+     <![CDATA[<a href="http://appdvn16:3005/" 
+      target="popup" 
+      onclick="window.open('http://appdvn16:3005/','_blank'); return false;">
+        DB SCHEDULING 
+    </a>]]>
+    </cell>
+	</row>
+
+  <row id="5">
+		<cell>5</cell>
+		<cell>  ITEM MASTER </cell>
+		<cell>v2022.04.09.1</cell>
+		<cell>
+     <![CDATA[<a href="http://147.121.73.4/RFID/ItemMaster/" 
+      target="popup" 
+      onclick="window.open('http://147.121.73.4/RFID/ItemMaster/','_blank'); return false;">
+        ITEM MASTER 
+    </a>]]>
+    </cell>
+	</row>
+
+  <row id="6">
+		<cell>6</cell>
+		<cell> ITEM MASTER (view) </cell>
+		<cell>v2022.04.09.1</cell>
+		<cell>
+     <![CDATA[<a href="http://147.121.73.4/RFID/ItemMaster/MasterItem.php" 
+      target="popup" 
+      onclick="window.open('http://147.121.73.4/RFID/ItemMaster/MasterItem.php','_blank'); return false;">
+        ITEM MASTER
+    </a>]]>
+    </cell>
+	</row>
+
+  <row id="7">
+		<cell>7</cell>
+		<cell> RELEASE JOBJACKET </cell>
+		<cell>v2022.04.09.1</cell>
+		<cell>
+     <![CDATA[<a href="http://147.121.73.4/RFID/ProductionRecord/Release.php" 
+      target="popup" 
+      onclick="window.open('http://147.121.73.4/RFID/ProductionRecord/Release.php','_blank'); return false;">
+        RELEASE JOBJACKET
+    </a>]]>
+    </cell>
+	</row>
+
+  <row id="8">
+		<cell>8</cell>
+		<cell> Print Management </cell>
+		<cell>v2022.04.09.1</cell>
+		<cell>
+     <![CDATA[<a href="http://147.121.73.4/RFID/ProductionRecord/Summary.php" 
+      target="popup" 
+      onclick="window.open('http://147.121.73.4/RFID/ProductionRecord/Summary.php','_blank'); return false;">
+        Print Management
+    </a>]]>
+    </cell>
+	</row>
+
+  <row id="9">
+		<cell>9</cell>
+		<cell> ORDER TRACKING </cell>
+		<cell>v2022.04.09.1</cell>
+		<cell>
+     <![CDATA[<a href="http://appdvn16:3002/pes-ui" 
+      target="popup" 
+      onclick="window.open('http://appdvn16:3002/pes-ui','_blank'); return false;">
+        ORDER TRACKING
+    </a>]]>
+    </cell>
+	</row>
+
+  <row id="10">
+		<cell>10</cell>
+		<cell> PNK </cell>
+		<cell>v2022.04.09.1</cell>
+		<cell>
+     <![CDATA[<a href="http://147.121.73.4/rfID/PNKData/PhieuNhapKhoTheoCRD.php" 
+      target="popup" 
+      onclick="window.open('http://147.121.73.4/rfID/PNKData/PhieuNhapKhoTheoCRD.php','_blank'); return false;">
+        PNK
+    </a>]]>
+    </cell>
+	</row>
+    <row id="11">
+		<cell>11</cell>
+		<cell> Inlay Scheduling - Beta </cell>
+		<cell>Test UAT V2</cell>
+		<cell>
+     <![CDATA[<a href="http://appdvn16/AutoPlan_Test" 
+      target="popup" 
+      onclick="window.open('http://appdvn16/AutoPlan_Test','_blank'); return false;">
+        Inlay Auto Plan
+    </a>]]>
+    </cell>
+	</row>
+
+</rows>

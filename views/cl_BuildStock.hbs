@@ -1,0 +1,98 @@
+
+
+
+    <div style="width:100%;height:100%;overflow: auto;" id="bodyMain">
+       <div style="width:100%;height: 30px; background:rgb(0, 0, 0); color:white;font-size:15pt;" id="HeaderBody">
+            <div style="float:left;width:300px;height:100%;line-height:1.2">            
+                {{title}}
+            </div>
+            <div style="text-align:center;float:right;width:250px;height:100%;line-height:1.2;color:black;background:yellow">
+                 PO: {{ID_JOB}}
+            </div>
+            <div style="text-align:center;float:right;width:250px;height:100%;line-height:1.2;color:white;background:rgb(104, 0, 0)">
+                 SO: <a ID="SO"></a>
+            </div>
+            <div style="text-align:center;float:right;width:150px;height:100%;line-height:1.2;color:black;background:rgb(255, 255, 255)">
+                 ID: <a ID="ID"></a>
+            </div>
+            <div style="text-align:center;float:right;width:100px;height:100%;line-height:1.2;color:black;background:rgb(255, 0, 0)">
+                 BÙ: <a ID="ID">{{BU}}</a>
+            </div>
+        </div>
+        
+        <div style="width:100%;height: calc(100% - 35px); background:blanchedalmond;margin-top:5px" id="LayoutMain"></div>
+    </div>
+<style>
+
+    #GridMain{
+        width:100% !important;
+    }
+
+    .V_NTID {
+        {{!-- display: none; --}}
+    }
+
+</style>
+
+<script>
+    var gridAW, gridLayout, gridGPM;
+    var layoutMain, tabbarMain;
+    var sku;
+    var colCur = [];
+
+    var clName = "{{clName}}";
+    var jobID = "{{ID_JOB}}";
+    var route = "{{Route}}";
+    var bu = "{{BU}}";
+    var modifyValue = false;
+
+    window.addEventListener('beforeunload', function (e) {
+        if(modifyValue ) {
+            e.returnValue = 'Sure';
+            e.preventDefault();
+            return 'Sure?';
+        }
+    });
+
+    var listCL = [];
+
+
+    var doOnLoad = () => {
+        let result = AjaxAsync("api/checklistLayout/GetData/",{
+            "ROUTE":route,
+            "ID_JOB":jobID,
+            "NAME":clName
+        },"GET", "JSON");
+
+        let jobJacket = result.jobjacket;
+        $("#ID").html(jobJacket["ID"]);
+        $("#SO").html(jobJacket["SOLINE"]);
+
+      
+        let dataHTML = result.dataHTML;
+        tabbarMain = new dhtmlXTabBar("LayoutMain");
+
+        for(let p in dataHTML) {
+            if(route != p) {
+                tabbarMain.addTab(p, p);
+                tabbarMain.tabs(p).attachHTMLString(dataHTML[p]);
+                $("." + p).prop("disabled", "disabled");
+            } else {
+                tabbarMain.addTab(p, p, null, null, true);
+                tabbarMain.tabs(p).attachHTMLString(dataHTML[p]);
+            }
+        }
+    }
+
+    var checkValue = e => {
+        $("#" + e.id + "_V").val(localStorage.getItem("NTID"));
+        console.log(e.checked);
+        {{!-- let result = AjaxAsync("api/checklistLayout/SaveData/",{
+            "ID_JOB":jobID,
+            "BU":bu,
+            "CODE":e.id,
+            "CHECKED": e.checked
+            "VALUE": localStorage.getItem("NTID"),
+        },"GET", "JSON"); --}}
+    }
+</script>

@@ -1,0 +1,587 @@
+    <div style="width:100%;height:100%;overflow: auto;" id="bodyMain">
+        <div style="width:100%;height: 30px; background:rgb(0, 0, 0); color:white;font-size:15pt;" id="HeaderBody">
+            <div style="float:left;width:100px;height:100%">            
+                <button onclick="SaveDataCheckList();" style="height:100%;width:100%">Save</button>
+            </div>
+            <div style="text-align:center;float:left;width:calc(100% - 110px);line-height:1.2">
+                Check list Inkjet 
+            </div>
+        </div>
+        <div style="width:100%;height: calc(100% - 30px); background:rgb(85, 85, 85);">
+            <div style="width:200px;height: 100%;float:left">
+                ABC
+            </div>
+            <div style="width:calc(100% - 200px);height: 100%; background:rgb(255, 255, 255);;float:left">
+                <div style="width:100%;height:100%;overflow:auto; padding: 20px">
+                    <div style="width:100%">
+                        
+                        <div style="width:100%;">
+                           <h6 style="font-weight:bold ;font-size:20px ;">Lệnh sản xuất :
+                             <input class="in" value="{{ID_JOB}}" style="width:30%"/>
+                                In Bù Lần 
+                             <input class="in" style="width:30%"/>
+                            </h6> 
+                        </div>
+                        <br/>
+
+                        <div style="width:100%;">
+                            NẠP CODE + INKJET : Máy <input class="in" style="width:20%"/>
+                           <p style="float:right;width: 20%;" > Ngày <input  class="in" style="width:80%"/></p>
+                        </div>
+                        <div style="width:100%">
+                            <table style="width:100%" border="1">
+                                <tr style="background:black">
+                                    <td style="width:3%"></td>
+                                    <td style="width:15%"></td>
+                                    <td style="width:30%"></td>
+                                    <td style="width:15%"></td>
+                                    <td style="width:7%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                </tr>
+                                <tr>
+                                    <th>STT.</th>
+                                    <th>Nội dung kiểm tra</th>
+                                    <th>Tần suất kiểm tra</th>
+                                    <th>Phương pháp/ dụng cụ kiểm tra</th>
+                                    <th>Người kiểm tra</th>
+                                    <th colspan="3">Kiểm mặt trước</th>
+                                    <th colspan="3">Kiểm mặt sau</th>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Đúng GPM, đúng vật tư</td>
+                                    <td>Mỗi lệnh sản xuất</td>
+                                    <td>Kiểm tra số GPM trên đơn hàng,code vật tư trên sticker trên bịch vật tư</td>
+                                    <td rowspan="8"> <p>Thợ nạp code + inkjet</p><input class="in" type="checkbox"/>Thợ in Kí tên <input class="in" style="width:100%"></td>
+                                    <td colspan="6"><input class="in" type="checkbox" id="vehicle1" />Trước nạp code</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Lỗi ngoại quan</td>
+                                    <td>Trước khi nạp code (nhãn đầu tiên mỗi sze)</td>
+                                    <td>Ngoại quan</td>
+                                   <td colspan="6"><input class="in" type="checkbox" id="vehicle1" />Trước nạp code</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Đơn hàng trước đã đóng trên phần mềm nạp code (đảm bảo data đã gửi lên D2Comm/ hệ thống K-R khác)</td>
+                                    <td>Sau khi nạp code</td>
+                                    <td>Ngoại quan</td>
+                                    <td colspan="6"><input class="in" type="checkbox" id="vehicle1" />Trước nạp code</td>
+
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>Đúng File nạp code</td>
+                                    <td>Sau khi nạp code</td>
+                                    <td>Ngoại quan</td>
+                                   <td colspan="6"><input class="in" type="checkbox" id="vehicle1" />Trước nạp code</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>Chọn đúng template inkjet</td>
+                                    <td>Trước khi nạp code</td>
+                                    <td>Theo tiêu chuẩn bắt ngược mặt(chú ý bắt 3 vùng trên barcode đối với item AND)</td>
+                                    <td colspan="6"><input class="in" type="checkbox" id="vehicle1" />Trước nạp code</td>
+
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td>Đúng logo và nội dung</td>
+                                    <td>Con nhãn đầu tiên</td>
+                                    <td>Ngoại quan, layout approval</td>
+                                    <td colspan="3"><input class="in" type="checkbox"/><label>Trước nạp code</label></td>
+                                    <td colspan="3"><input class="in" type="checkbox"/><label>Trước nạp code </td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td>Lỗi ngoại quan</td>
+                                    <td>Con nhãn đầu tiên</td>
+                                    <td>Ngoại quan</td>
+                                    <td colspan="3"><input class="in" type="checkbox"/><label>Đầu</label></td>
+                                    <td colspan="3"><input  class="in" type="checkbox"/><label>Đầu </td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td>Lệch mặt trước - sau</td>
+                                    <td>Con nhãn đầu tiên</td>
+                                    <td>Thước film</td>
+                                     <td colspan="3"><input class="in" type="checkbox"/><label>Đầu</label></td>
+                                    <td colspan="3"><input class="in" type="checkbox"/><label>Đầu </label> </td>
+                                </tr>
+                                <tr>
+                                    <td>9</td>
+                                    <td>Barcode</td>
+                                    <td>Con nhãn đầu tiên và con nhãn cuối cùng</td>
+                                    <td>Máy scan barcode</td>
+                                    <td rowspan="8"> <p>Người kiểm trên chuyền</p><input class="in" type="checkbox"/>Thợ in Kí tên <input class="in" style="width:100%"></td>
+                                    <td colspan="6"><input class="in" type="checkbox"/><label>Đã kiểm</label><span/>
+                                    <input class="in" type="checkbox"/><label>N/A </label>
+                                        <br/>
+                                    <label>Điểm barcode: Nhãn đầu :</label><input class="in" style="min-width:20px;width:20%"/> 
+                                   <label>Nhãn cuối :</label><input class="in" style="min-width:20px;width:20%"/> 
+                                    </td>
+                                   
+
+                                </tr>
+                                  <tr>
+                                    <td>10</td>
+                                    <td>QR code (nếu có)</td>
+                                    <td>Con nhãn đầu tiên và con nhãn cuối cùng</td>
+                                    <td>Máy scan barcode</td>
+                                    <td colspan="6"><input class="in" type="checkbox"/><label>Đã kiểm</label><span/>
+                                    <input class="in" type="checkbox"/><label>N/A </label>
+                                        <br/>
+                                    <label>Điểm barcode: Nhãn đầu :</label><input class="in" style="min-width:20px;width:20%"/> 
+                                   <label>Nhãn cuối :</label><input class="in" style="min-width:20px;width:20%"/> 
+                                    </td>
+                                   
+
+                                </tr>
+                                <tr>
+                                    <td>11</td>
+                                    <td>Clear sạch nhãn canh máy</td>
+                                    <td>Trước khi chạy đơn hàng</td>
+                                    <td>Ngoại quan</td>
+                                    <td colspan="6"><input class="in" type="checkbox"/><label>Đầu</label> </td>
+                                </tr>
+                                <tr>
+                                    <td>12</td>
+                                    <td>Crocking test</td>
+                                    <td>Con nhãn đầu tiên</td>
+                                    <td>Máy crocking test</td>
+                                    <td colspan="6"><input class="in" type="checkbox"/><label>Đầu</label> </td>
+                                </tr>
+                                <tr>
+                                    <td>13</td>
+                                    <td>EPC matching QR (nếu có)</td>
+                                    <td>Con nhãn đầu tiên mỗi SKU</td>
+                                    <td>Máy scan barcode + phần mềm scan</td>
+                                    <td colspan="6"><input class="in" type="checkbox"/><label>Đầu</label> <input class="in" type="checkbox"/><label>N/A</label></td>
+                                </tr>
+                                 <tr>
+                                    <td>14</td>
+                                    <td>Lỗi ngoại quan</td>
+                                    <td>Con nhãn đầu tiên, trong quá trình chạy (mỗi 200 con), con nhãn cuối cùng</td>
+                                    <td>Ngoại quan</td>
+                                     <td colspan="3"><input class="in" type="checkbox"/><label>Đầu</label><input class="in" type="checkbox"/><label>Giữa</label><input class="in" type="checkbox"/><label>Cuối</label></td>
+                                     <td colspan="3"><input class="in" type="checkbox"/><label>Đầu</label><input class="in" type="checkbox"/><label>Giữa</label><input class="in" type="checkbox"/><label>Cuối</label></td>
+                                </tr>
+                                <tr>
+                                    <td>15</td>
+                                    <td>Lệch mặt trước - sau (nếu có)</td>
+                                    <td>Con nhãn đầu tiên, trong quá tình chạy (tùy mỗi site), con nhãn cuối cùng</td>
+                                    <td>Thước film</td>
+                                     <td colspan="3"><input class="in" type="checkbox"/><label>Đầu</label><input class="in" type="checkbox"/><label>Giữa</label><input class="in" type="checkbox"/><label>Cuối</label></td>
+                                     <td colspan="3"><input class="in" type="checkbox"/><label>Đầu</label><input class="in" type="checkbox"/><label>Giữa</label><input class="in" type="checkbox"/><label>Cuối</label></td>
+                                </tr>
+                                 <tr>
+                                    <td>16</td>
+                                    <td>Đúng EPC schema, EPC không bị trùng</td>
+                                    <td>5 con nhãn đầu tiên, trong quá trình kiểm (>= 70%), 5 con nhãn cuối, 20 nhãn đầu và cuối khi có lỗi level 2 xảy ra (hoặc theo yêu cầu riêng của khách hàng)</td>
+                                    <td>Đầu đọc RFID</td>
+                                     <td colspan="6"><input class="in" type="checkbox"/><label>Đầu</label><input class="in" type="checkbox"/><label>Giữa</label><input class="in" type="checkbox"/><label>Cuối</label></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+
+                    <br/>
+                    <div style="width:100%">
+                       <div style="width:100%;">
+                           Labeling (Applicator) 
+                           <p style="float:right;width: 20%;" > Ngày <input  class="in" style="width:80%"/></p>
+                        </div>
+                        <div style="width:100%">
+                            <table style="width:100%" border="1">
+                                <tr style="background:black">
+                                    <td style="width:3%"></td>
+                                    <td style="width:15%"></td>
+                                    <td style="width:30%"></td>
+                                    <td style="width:15%"></td>
+                                    <td style="width:7%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                </tr>
+                                <tr>
+                                    <th>STT.</th>
+                                    <th>Nội dung kiểm tra</th>
+                                    <th>Tần suất kiểm tra</th>
+                                    <th>Phương pháp/ dụng cụ kiểm tra</th>
+                                    <th>Người kiểm tra</th>
+                                    <th colspan="3">Kiểm mặt trước</th>
+                                    <th colspan="3">Kiểm mặt sau</th>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Đúng vật tư</td>
+                                    <td>Mỗi lệnh sản xuất</td>
+                                    <td>Ngoại quan, đảm bảo giấy và inlay đúng theo thông tin trên đơn hàng</td>
+                                    <td rowspan="1"><input class="in" type="checkbox"/>Thợ máy kí tên <input class="in" style="width:100%"></td>
+                                    <td colspan="6"><input class="in" type="checkbox"/><label>Đã kiểm</label> <input class="in" style="width:50%"></td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Nội dung nhãn khớp với nội dung tem treo</td>
+                                    <td>Nhãn đầu tiên mỗi SKU</td>
+                                    <td>Ngoại quan</td>
+                                    <td rowspan="4">Người kiểm trên chuyền:<br/>Kí tên <input class="in" style="width:100%"></td>
+                                    <td colspan="6"><input class="in" type="checkbox"/><label>Đầu</label></td>
+
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Lỗi ngoại quan</td>
+                                    <td>Kiểm tra 10%</td>
+                                    <td>Ngoại quan</td>
+                                    <td colspan="1"><input class="in" type="checkbox"/><label>Đầu</label> </td>
+                                    <td colspan="1"><input class="in" type="checkbox"/><label>Giữa</label> </td>
+                                    <td colspan="1"><input class="in" type="checkbox"/><label>Cuối</label> </td>
+                                    <td colspan="3"><input class="in" type="checkbox"/><label>Sau khi labeling</label> </td>
+
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>Đúng hướng</td>
+                                    <td>TKiểm tra 100%</td>
+                                    <td>Ngoại quan</td>                                
+                                    <td colspan="6"><input class="in" type="checkbox"/><label>Đã kiểm</label> </td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>Không bị lệch định vị</td>
+                                    <td>TKiểm tra 100%</td>
+                                    <td>Ngoại quan</td>                                
+                                    <td colspan="6"><input class="in" type="checkbox"/><label>Đã kiểm</label> </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    
+                    <br/>
+                    <div style="width:100%">
+                        <div style="width:100%;">
+                           XỎ DÂY
+                           <p style="float:right;width: 20%;" > Ngày <input  class="in" style="width:80%"/></p>
+                        </div>
+                        <div style="width:100%">
+                            <table style="width:100%" border="1">
+                                <tr style="background:black">
+                                    <td style="width:3%"></td>
+                                    <td style="width:15%"></td>
+                                    <td style="width:30%"></td>
+                                    <td style="width:15%"></td>
+                                    <td style="width:7%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                </tr>
+                                <tr>
+                                    <th>STT.</th>
+                                    <th>Nội dung kiểm tra</th>
+                                    <th>Tần suất kiểm tra</th>
+                                    <th>Phương pháp/ dụng cụ kiểm tra</th>
+                                    <th>Người kiểm tra</th>
+                                    <th colspan="3">Kiểm mặt trước</th>
+                                    <th colspan="3">Kiểm mặt sau</th>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Đúng dây treo</td>
+                                    <td>Mỗi lệnh sản xuất</td>
+                                    <td>Ngoại quan</td>
+                                    <td rowspan="6"><input class="in" type="checkbox"/>Thợ cột dây kí tên : <input class="in"style="width:100%"></td>
+                                    <td colspan="6"><input class="in" type="checkbox"/><label>Đã kiểm</label> Code vật tư <input class="in" style="width:50%"></td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Đúng nút cột</td>
+                                    <td>Nhãn đầu tiên</td>
+                                    <td>Ngoại quan</td>
+                                      <td colspan="2"><input class="in" type="checkbox"/><label>Đầu</label></td>
+                                    <td colspan="2"><input class="in"  type="checkbox"/><label>Giữa</label></td>
+                                    <td colspan="2"><input class="in"  type="checkbox"/><label>Cuối</label> </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Đúng số lượng và vị trí nhãn</td>
+                                    <td>Nhãn đầu tiên</td>
+                                    <td>Ngoại quan</td>
+                                    <td colspan="2"><input class="in"  type="checkbox"/><label>Đầu</label> </td>
+                                    <td colspan="2"><input class="in"  type="checkbox"/><label>Giữa</label> </td>
+                                    <td colspan="2"><input class="in"  type="checkbox"/><label>Cuối</label> </td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>Chiều dài</td>
+                                    <td>Nhãn đầu tiên</td>
+                                    <td>Thước</td>   
+                                    <td colspan="2"><input class="in"  type="checkbox"/><label>Đầu</label> </td>
+                                    <td colspan="2"><input class="in"  type="checkbox"/><label>Giữa</label> </td>
+                                    <td colspan="2"><input class="in"  type="checkbox"/><label>Cuối</label> </td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>Nhãn đầu tiên</td>
+                                    <td>Mỗi lot (SKU) <br/>(Báo cáo xác nhận)</td>
+                                    <td>Ngoại quan</td>
+                                    <td colspan="2"><input class="in"  type="checkbox"/><label>Đầu</label> <input class="in" style="min-width:30px;width:50%"/></td>
+                                    <td colspan="2"><input class="in"  type="checkbox"/><label>Cắt nóng</label> <input class="in" style="min-width:30px;width:50%"/></td>
+                                    <td colspan="2"><input class="in"  type="checkbox"/><label>Cắt nguội</label> <input class="in" style="min-width:30px;width:50%"/></td>
+                                </tr>
+                                 <tr>
+                                    <td>5</td>
+                                    <td>Nhãn đầu tiên</td>
+                                    <td>Mỗi lot (SKU) <br/>(Báo cáo xác nhận)</td>
+                                    <td>Ngoại quan, layout approved</td>
+                                    <td colspan="6"><input class="in"  type="checkbox"/><label>Đầu</label> </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    
+                    <br/>
+                    <div style="width:100%">
+                       <div style="width:100%;">
+                           QC 100% ( Đối với UQ/GU)
+                           <p style="float:right;width: 20%;" > Ngày <input  class="in" style="width:80%"/></p>
+                        </div>
+                        <div style="width:100%">
+                            <table style="width:100%" border="1">
+                                <tr style="background:black">
+                                    <td style="width:3%"></td>
+                                    <td style="width:15%"></td>
+                                    <td style="width:30%"></td>
+                                    <td style="width:15%"></td>
+                                    <td style="width:7%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                </tr>
+                                <tr>
+                                    <th>STT.</th>
+                                    <th>Nội dung kiểm tra</th>
+                                    <th>Tần suất kiểm tra</th>
+                                    <th>Phương pháp/ dụng cụ kiểm tra</th>
+                                    <th>Người kiểm tra</th>
+                                    <th colspan="3">Kiểm mặt trước</th>
+                                    <th colspan="3">Kiểm mặt sau</th>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Lỗi ngoại quan</td>
+                                    <td>Kiểm tra 100%</td>
+                                    <td>Ngoại quan</td>
+                                    <td rowspan="6"><input class="in"  type="checkbox"/>QC kí tên : <input class="in" style="width:100%"></td>
+                                    <td colspan="6"><input class="in"  type="checkbox"/><label>Đã kiểm</label> </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Không bị lẫn lộn</td>
+                                    <td>Kiểm tra 100%</td>
+                                    <td>Ngoại quan</td>
+                                    <td colspan="6"><input class="in"  type="checkbox"/><label>Đã kiểm</label> </td>
+
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Kiểm tra 100%</td>
+                                    <td>Ngoại quan</td>
+                                    <td>Thước</td>
+                                    <td colspan="6"><input class="in"  type="checkbox"/><label>Đã kiểm</label> </td>
+
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>Đúng EPC schema  , EPC không bị trung</td>
+                                    <td>Kiểm tra 100%</td>
+                                    <td>Đầu đọc RFID</td>
+                                    <td colspan="6"><input class="in"  type="checkbox"/><label>Đã kiểm</label> </td>
+                                   
+                                </tr>
+                                <tr>
+                                    <td>5 LC</td>
+                                    <td>Xác nhận kiểm tra trước khi gộp nhãn đơn bù vào nhãn đơn chính:- Nội dung nhãn bù đúng với Layout approval</td>
+                                    <td>1 pcs mỗi SKU bù</td>
+                                    <td>Ngoại quan</td>   
+                                    <td colspan="6"><input class="in"  type="checkbox"/><label>Đã kiểm</label> </td>
+
+                                </tr>
+                                
+                            </table>
+                        </div>
+                    </div>
+                    <br/>
+                    <div style="width:100%">
+                       <div style="width:100%;">
+                           Đóng gói
+                           <p style="float:right;width: 20%;" > Ngày <input  class="in" style="width:80%"/></p>
+                        </div>
+                        <div style="width:100%">
+                            <table style="width:100%" border="1">
+                                <tr style="background:black">
+                                    <td style="width:3%"></td>
+                                    <td style="width:15%"></td>
+                                    <td style="width:30%"></td>
+                                    <td style="width:15%"></td>
+                                    <td style="width:7%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                    <td style="width:5%"></td>
+                                </tr>
+                                <tr>
+                                    <th>STT.</th>
+                                    <th>Nội dung kiểm tra</th>
+                                    <th>Tần suất kiểm tra</th>
+                                    <th>Phương pháp/ dụng cụ kiểm tra</th>
+                                    <th>Người kiểm tra</th>
+                                    <th colspan="3">Kiểm mặt trước</th>
+                                    <th colspan="3">Kiểm mặt sau</th>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Đúng vơi yêu cầu riêng của khách hàng( bao gồm số lượng, thông tin sản phẩm và phương pháp đóng gói</td>
+                                    <td>Mỗi lệnh sản xuất</td>
+                                    <td>Ngoại quan</td>
+                                    <td rowspan="6"><input class="in"  type="checkbox"/>Người đóng gói kí tên : <input class="in" style="width:100%"></td>
+
+                                    <td colspan="6"><input class="in"  type="checkbox"/><label>Đã kiểm</label> </td>
+                                </tr>
+                                <tr>
+                                    <td>2 LC</td>
+                                    <td>Xác nhận kiểm tra trước khi gộp nhãnđơn bù vào nhãn đơn chính:- Nội dung nhãn bù đúng với Layout approval</td>
+                                    <td>1 pcs mỗi SKU bù</td>
+                                    <td>Ngoại quan</td>
+                                    <td colspan="6"><input class="in"  type="checkbox"/><label>Đã kiểm</label> </td>
+
+                                </tr>
+                                
+                            </table>
+                        </div>
+                    </div>
+
+
+                   
+
+                    
+                    
+                
+
+                </div>
+            </div>
+        </div>
+    </div>
+<style>
+    td {
+        padding-left: 3px;
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+
+    label {
+        padding-left: 3px;
+    }
+
+    th {
+        background: black;
+        color: white;
+        padding-left: 3px;
+    }
+
+    .NTID_Name {
+        {{#if SHOW}} 
+        {{else}}
+        visibility:hidden;
+        {{/if}}
+    }
+
+    .Sign{
+        visibility: inherit !important;
+    }
+</style>
+
+<script>
+   
+      function SaveDataCheckList(){
+     let id_job = "{{ID_JOB}}"
+     let arrData = [];
+    var dtID = document.getElementsByClassName(`in`);
+
+        for(let j = 0; j< dtID.length;j++){
+            if(dtID.length > 0){
+             {{!-- if(dtID[j].checked){
+                dtID[j].value = '1'
+             } --}}
+
+                    arrData.push({
+                     Route : "Inkjet",
+                     id : j,
+                     value :dtID[j].value,
+                     check : dtID[j].checked
+                    })
+            }
+        
+     }
+     let result = AjaxAsync("api/checklist/inkjet/",{
+                "ID_JOB":id_job,
+                "PIC" : localStorage.getItem("NTID"),
+                "DATA_SEND":arrData
+    },"POST", "JSON");
+    if(result.code == 200){
+        let LoadResult = AjaxAsync("api/checklist/LoadData_inkjet",{
+            "ID_JOB":id_job
+        },"GET", "JSON")
+        if(LoadResult.code == 200){
+            alert(LoadResult.mess);
+            for (n = 0; n < LoadResult.output.length; n++) {
+                if(LoadResult.output[n].value == 'TRUE'){
+                     dtID[LoadResult.output[n].id_task].checked = true
+                }else{
+                   dtID[LoadResult.output[n].id_task].value= LoadResult.output[n].value;
+                }
+            }
+        }
+    }
+   }
+    var doOnLoad = () => {
+     let id_job = "{{ID_JOB}}"
+    var dtID = document.getElementsByClassName(`in`);
+
+        if(id_job !== ""){
+        let LoadResult = AjaxAsync("api/checklist/LoadData_inkjet",{
+            "ID_JOB":id_job
+        },"GET", "JSON")
+        if(LoadResult.code == 200){
+            alert(LoadResult.mess);
+            for (n = 0; n < LoadResult.output.length; n++) {
+                if(LoadResult.output[n].value == 'TRUE'){
+                     dtID[LoadResult.output[n].id_task].checked = true
+                }else{
+                   dtID[LoadResult.output[n].id_task].value= LoadResult.output[n].value;
+                }
+            }
+        }
+    }
+    }
+</script>

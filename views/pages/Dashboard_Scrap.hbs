@@ -1,0 +1,114 @@
+<div >
+   <script>
+      
+        var LayoutMain, ToolbarMain , BarChartTotal ;
+        function doOnLoad(){
+            LayoutMain = new dhtmlXLayoutObject({
+                    parent: document.body,
+                    pattern: "1C",
+                    cells: [
+                        {id: "a", header: true,text: "Data Total Scrap"}, 
+                    ],
+                    offsets: {          // optional, offsets for fullscreen init
+                     top:    50,     // you can specify all four sides
+                     right:  10,     // or only the side where you want to have an offset
+                     bottom: 10,
+                     left:   10
+                  },
+                });
+
+               ToolbarMain = LayoutMain.cells('a').attachToolbar({
+                        icons_path: "/dhtmlx/common/imgs/",
+                        align: "left",
+                })
+                      ToolbarMain.addText("Title", null, " <a style='font-size:20pt;font-weight:bold'> Dashboard Scrap</a>");
+                       ToolbarMain.addText("text_from", null, "From");
+                     ToolbarMain.addInput("date_from", null, "", 150);
+                     ToolbarMain.addText("text_to", null, "To");
+                     ToolbarMain.addInput("date_to", null, "", 150);
+                     input_from = ToolbarMain.getInput("date_from");
+                     input_from.setAttribute("readOnly", "false");
+                     input_from.onclick = function(){ setSens(input_till,"max"); }
+                     
+                     input_till = ToolbarMain.getInput("date_to");
+                     input_till.setAttribute("readOnly", "false");
+                     input_till.onclick = function(){ setSens(input_from,"min"); }
+                     ToolbarCalendar = new dhtmlXCalendarObject([input_from,input_till]);
+                     ToolbarCalendar.setDateFormat("%Y-%m-%d");
+
+                  
+                     ToolbarMain.addButton("GetChart", null, "Get Data", "upload.png");
+                  //Chart
+                     ToolbarMain.attachEvent("onClick",function(name){
+                         if(name == "GetChart"){
+                            dhtmlx.message({
+                           text:"Load Data Success",
+                           expire:6000,
+                           type:"customCss" // 'customCss' - css class
+                        });
+                           var URI = "http://147.121.56.228:9000/pes-api/scrap/get-data-scrap";
+                           var Result = AjaxAsync(`${URI}`,{startday: ToolbarMain.getValue("date_from"),endday : ToolbarMain.getValue("date_to")},"POST","JSON");
+                          if(Result.output != undefined){
+                             BarChartTotal.parse(Result.output,"json")
+                          }else{
+                             BarChartTotal.parse([],"json")
+                          }
+                         }
+                     })
+                
+                  BarChartTotal = LayoutMain.cells('a').attachChart({
+                     view:"stackedBar",
+                     value : "#scrap#",
+                     label : "#scrap#",
+                     color : "#36abee",
+                     gradient:"falling",
+                     color:function(obj){
+                        if(Math.ceil(obj.scrap) < 4.3){
+                           return "#36abee";
+                        }else{
+                           return "#990000";
+                        }
+                     },
+                     border:true,
+                     xAxis:{
+                        template:"#date#",
+
+                        lines: false
+                     },
+                     yAxis:{
+                        start:0,
+                        end:10,
+                        step:1,
+                        lines:true
+
+                     },
+                      legend:{
+                        values:[{text:"Scrap Daily",color:"#36abee"},{text:"Target-Daily",color:"#ff9900"}],
+                        valign:"top",
+                        align:"right",
+                        width:160,
+                        layout:"y"
+                     }
+                  })
+                   BarChartTotal.addSeries({
+                     view:"line",
+                     value:"4.3",
+                     color:"#990000",
+                     label:"4.3",
+                     tooltip:{
+                        template:"#date#",
+                           lines: false
+                     },
+                     line:{
+                           color:"#ff9900",
+                           width:3
+                        },
+                     item:{  radius:0 },
+
+
+
+               });
+        }
+          
+   </script>
+</div>

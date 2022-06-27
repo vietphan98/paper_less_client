@@ -1,0 +1,489 @@
+
+
+
+    <div style="width:100%;height:100%;overflow: auto;" id="bodyMain">
+        <div style="width:100%;height: 30px; background:rgb(0, 0, 0); color:white;font-size:15pt;" id="HeaderBody">
+            <div style="float:left;width:100px;height:100%">            
+                
+            </div>
+            <div style="text-align:center;float:left;width:calc(100% - 110px);line-height:1.2;font-weight:bold">
+                BẢNG PHÂN PHỐI SỐ LƯỢNG YÊU CẦU THEO LOT - {{ID_JOB}}
+            </div>
+        </div>
+        <div style="width:100%;height: 170px;">
+            <div style="width:40%;height:100%;float:left;">
+                <table style="width:100%;height:100%;">
+                     <tr style="height:1%">
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr style="height:24%">
+                        <td class="borderCell">Số lệnh SX</td>
+                        <td class="borderCell" style="font-weight:bold">{{ID_JOB}}</td>
+                    </tr>
+                    <tr style="height:18%">
+                        <td class="borderCell">Ngày làm lệnh</td>
+                        <td class="borderCell" id="CREATED_DATE" style="font-weight:bold"></td>
+                    </tr>
+                    <tr style="height:19%">
+                        <td class="borderCell">SO Line</td>
+                        <td class="borderCell" id="SOLINE" style="font-weight:bold"></td>
+                    </tr>
+                    <tr style="height:18%">
+                        <td class="borderCell">Oracle Item</td>
+                        <td class="borderCell" id="ITEM" style="font-weight:bold"></td>
+                    </tr>
+                    <tr style="height:19%">
+                        <td class="borderCell">Số lượng</td>
+                        <td class="borderCell" id="QTY" style="font-weight:bold"></td>
+                    </tr>
+                     <tr style="height:1%">
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="width:20%;height:100%;float:left">
+                <table style="width:100%;height:100%;">
+                    <tr style="height:20%">
+                        <td rowspan="5" style="width:15%"></td>
+                        <td>Số UPS</td>
+                        <td rowspan="5" style="width:15%"></td>
+                    </tr>
+                    <tr style="height:20%">
+                        <td id="UPS" style="background:yellow;border:1px black solid;font-weight:bold;text-align:center"></td>
+                    </tr>
+                    <tr style="height:30%">
+                        <td style="">INLAY SCRAP</td>
+                    </tr>
+                    <tr style="height:20%">
+                        <td style="background:yellow;border:1px black solid;font-weight:bold;text-align:center">-100.00%</td>
+                    </tr>
+                    <tr style="height:10%">
+                        <td style=""></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="width:40%;height:100%;float:left;">
+                <table style="width:100%;height:100%;">
+                    <tr style="height:1%">
+                        <td style="width:30%"></td>
+                        <td style="width:40%"></td>
+                        <td style="width:30%"></td>
+                    </tr>
+                    <tr style="height:15%">
+                        <td class="borderCell" colspan="2">Ngày giao hàng yêu cầu</td>
+                        <td class="borderCell" id="REQUEST_DATE" style="font-weight:bold;background: yellow"></td>
+                    </tr>
+                    <tr style="height:15%">
+                        <td class="borderCell" colspan="2">Promise Date</td>
+                        <td class="borderCell" id="PROMISE_DATE" style="font-weight:bold;background: yellow"></td>
+                    </tr>
+                    <tr style="height:15%">
+                        <td class="borderCell">GPM batch:</td>
+                        <td class="borderCell" id="GPM" colspan="2" style="font-weight:bold;background: yellow"></td>
+                    </tr>
+                    <tr style="height:33%">
+                        <td class="borderCell">RBO:</td>
+                        <td class="borderCell" id="RBO" colspan="2" style="font-weight:bold;background: yellow"></td>
+                    </tr>
+                    <tr style="height:20%">
+                        <td class="borderCell">Order Item:</td>
+                        <td class="borderCell" id="CUSTOMER_ITEM" colspan="2" style="font-weight:bold;background: yellow"></td>
+                    </tr>
+                    <tr style="height:1%">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div style="width:100%;height: calc(100% - 200px); background:blanchedalmond;" id="GridMain"></div>
+    </div>
+
+<style>
+
+    #GridMain{
+        width:100% !important;
+    }
+
+    td.borderCell {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding-left:5px;
+    }
+
+</style>
+
+<script>
+    var gridMain;
+    var dataJob;
+    var colCur = [];
+    var modifyValue = false;
+    window.addEventListener('beforeunload', function (e) {
+        if(modifyValue ) {
+            e.returnValue = 'Sure';
+            e.preventDefault();
+            return 'Sure?';
+        }
+    });
+
+    var doOnLoad = () => {
+        $("#navRight").html(`<button class="btn btn-outline-success my-2 my-sm-0" style="height: calc(1.2em + 0.75rem + 2px) !important;float: right !important;" onClick="saveDataGrid()">Save</button>`)
+        let dataEmpty = [];
+        let colID = ["ID","SOL","GPM"]
+        let colType = ["ro","ro","ed"];
+        let colColor = ["","yellow",""];
+        let colInitWidth = ["30","70","70"];
+        let colMinWidth = ["30","50","70"];
+        let colAlign = ["center","center","center"];
+        let colHeader = [0,1,2];
+        let colHeader1 = ["LOT","SKU Canh Bài","Số GPM Yêu cầu"];
+        let colHeader1C = ["","",""]
+        let colHeader2 = ["","",""];
+        let colHeader2C = ["border-top: none;","border-top: none;","border-top: none;"];
+        let colHeader3 = ["","",""];
+        let colHeader3C = ["border-top: none;","border-top: none;","border-top: none;"];
+        let colHeader4 = ["","Total",""];
+        let colHeader4C = ["border-right: none;","border-right: none;",""];
+
+        let dtLoad = AjaxAsync("api/report_lot/GetDataNew/",{
+            "ID_JOB":"{{ID_JOB}}"
+        },"GET", "JSON");
+        if(dtLoad.code == 200 && dtLoad.output.length > 0) {
+            
+        }
+
+        let dataHeader = dtLoad.output.HEADER;
+        dataJob = dtLoad.output.JOBJACKET[0];
+
+        for(let v in dataJob) {
+            $("#" + v).html(dataJob[v]);
+        }
+
+        dataHeader.reverse().forEach( (v,i) => {
+            colAlign.push("center");
+            colAlign.push("center");
+
+            dataEmpty.push("");
+            dataEmpty.push("");
+
+            colID.push(v.PROCESS_CODE + "_A");
+            colID.push(v.PROCESS_CODE + "_B");
+
+            colHeader.push(v.PROCESS_CODE);
+            colHeader.push("_");
+
+            colHeader1.push(v.VN_NAME + "<br/>" + v.EN_NAME + "<br/>");
+            colHeader1.push("#cspan");
+            
+            colHeader2.push(v.UNIT);
+            colHeader2.push("#cspan");
+            
+            colHeader3.push("Yêu cầu");
+            colHeader3.push("Thực tế");
+            
+            colHeader4.push(v.TOTAL);
+            colHeader4.push("#cspan");
+            
+            colInitWidth.push("80");
+            colInitWidth.push("*");
+
+            colMinWidth.push("40");
+            colMinWidth.push("70");
+
+            if(v.PROCESS_CODE == "{{Route}}") {
+                colType.push("ro");
+                colType.push("ed");
+
+                colColor.push("#d5e1ff");
+                colColor.push("#d5f1ff");
+
+                colCur.push(colHeader.length - 1);
+
+                colHeader1C.push("color:red");
+                colHeader1C.push("color:red");
+                
+                colHeader2C.push("color:red");
+                colHeader2C.push("color:red");
+                
+                colHeader3C.push("color:red");
+                colHeader3C.push("color:red");
+                
+                colHeader4C.push("color:red");
+                colHeader4C.push("color:red");
+
+            } else {
+                colType.push("ro");
+                colType.push("ro");
+
+                colColor.push("");
+                colColor.push("");
+
+                colHeader1C.push("");
+                colHeader1C.push("");
+                
+                colHeader2C.push("");
+                colHeader2C.push("");
+                
+                colHeader3C.push("");
+                colHeader3C.push("");
+                
+                colHeader4C.push("");
+                colHeader4C.push("");
+            }
+        })
+        
+        colID.forEach((id) => {
+            if(id.split('_')[0] == "{{Route}}") {
+                colType.push("ed");
+                colColor.push("#d5f1ff");
+            }
+            else {
+                colType.push("ro");
+                colColor.push("");
+            }
+        })
+
+        colHeader1C[3] = colHeader1C[3] + ";border-left: 1px #dbdbdb solid;";
+        colHeader2C[3] = colHeader2C[3] + ";border-left: 1px #dbdbdb solid;";
+        colHeader3C[3] = colHeader3C[3] + ";border-left: 1px #dbdbdb solid;";
+        colHeader4C[3] = colHeader4C[3] + ";border-left: 1px #dbdbdb solid;";
+
+        gridMain = new dhtmlXGridObject('GridMain');
+        gridMain.setImagePath("/dhtmlx/skins/web/imgs/");
+        gridMain.setHeader(colHeader.join(","),["","","","border-left: 1px #dbdbdb solid;"]);
+        gridMain.attachHeader(colHeader1.join(","),colHeader1C);
+        gridMain.attachHeader(colHeader2.join(","),colHeader2C); //,"border-left: 1px #dbdbdb solid;"
+        gridMain.attachHeader(colHeader3.join(","),colHeader3C);
+        gridMain.attachHeader(colHeader4.join(","),colHeader4C);
+        gridMain.setColumnColor(colColor.join(","));
+        gridMain.setColumnIds(colID.join(","));
+        gridMain.setColTypes(colType.join(","));
+        gridMain.setInitWidths(colInitWidth.join(","));
+        gridMain.setColumnMinWidth(colMinWidth.join(","));
+        gridMain.setColAlign(colAlign.join(","));
+        gridMain.setStyle(
+            "text-align:center;font-weight:bold;",
+            "","background: blanchedalmond",""
+        );
+        gridMain.enableBlockSelection(true); 
+        gridMain.init();
+        //gridMain.detachHeader(0);
+        var remarkArr = ["0"].concat(dataEmpty);
+        remarkArr[2] = "_";
+        for(let i = 3; i < remarkArr.length; i+=2) remarkArr[i] = "Ghi Chú:";
+
+        gridMain.addRow("0",remarkArr);
+        gridMain.addRow("R",[""]);
+        gridMain.setRowColor("R","black");
+        gridMain.setCellTextStyle("R",0,"color:white;border:1px solid gray;font-weight:bold");
+        for(let i = 3; i < remarkArr.length; i+=2) gridMain.setCellTextStyle("0",i,"color:black;background:lime;font-weight:bold");
+
+
+        gridMain.splitAt(3);
+        let n = 1;
+        while (n < 100) {
+            gridMain.addRow(n,[n, ""].concat(dataEmpty));
+            n++;
+        }
+
+        let dtGrid = dtLoad.output.DATA;
+            dtGrid.forEach((r,i) => {
+                let colID = gridMain.getColIndexById(`${r.route_step}_${r.confirm}`);
+                try {
+                    gridMain.cells(r.seq, colID).setValue(r.value);
+                } catch {}
+            });
+
+        let alignSKU = [];
+        let dtLOT = dtLoad.output.LOT;
+            dtLOT.forEach((r,i) => {
+                let colID = gridMain.getColIndexById(`${r.PROCESS_CODE}_A`);
+                try {
+                    gridMain.cells(r.LOT, colID).setValue(r.QTY - r.SCRAP);
+                    if(r.PROCESS_CODE == "PA") {
+                        gridMain.cells(r.LOT, 2).setValue(r.QTY - r.SCRAP);
+                        alignSKU.push(r.QTY - r.SCRAP);
+                    } else if(r.PROCESS_CODE == "QC") {
+                        let colIDLS = gridMain.getColIndexById(`LS_A`);
+                        gridMain.cells(r.LOT, colIDLS).setValue(r.QTY - r.SCRAP);
+                    }
+                } catch {}
+            });
+
+        gridMain.forEachRow(id => {
+            if(gridMain.cells(id,2).getValue() == Math.max.apply(Math, alignSKU).toString()) gridMain.cells(id,1).setValue("X");
+        })
+
+        gridMain.attachEvent("onEditCell", function(stage,rId,cInd,nValue,oValue){
+            if (stage==1 && this.editor){
+                this.editor.obj.select();
+            } else if(stage == 2) {
+                modifyValue = true;
+                if(isNaN(nValue) && rId != 0) {
+                    alert(nValue + " Không phải số, Vui lòng thử lại");
+                    gridMain.cells(rId, cInd).setValue(oValue);
+                }
+            }
+            return true;
+        });
+        gridMain.attachEvent("onKeyPress", function(code,cFlag,sFlag){
+            var LastRow = this.getRowsNum();
+            if(this.getSelectedBlock() == null) return;
+            var top_row = this.getSelectedBlock().LeftTopRow;
+            var IndexRow = top_row;
+            if(typeof top_row == "string") IndexRow = this.getRowIndex(top_row);
+            var bottom_row = this.getSelectedBlock().RightBottomRow;
+            var left_column = this.getSelectedBlock().LeftTopCol;
+            var right_column = this.getSelectedBlock().RightBottomCol;
+            if(cFlag && code == 83) {
+                saveDataGrid();
+            } else if(!this.editor && (!cFlag) && ((code > 64 && code < 91) || (code > 47 && code < 58)) || code == 113 || (code >= 96 && code <= 105)) { // Any Key
+                if(typeof top_row == "string") this.editCell(); 
+                else this.editCell();
+                return false;
+            } else if(!cFlag && !sFlag && code == 13) { //Enter
+                if(IndexRow + 1 == LastRow) return;
+                this.selectCell(IndexRow + 1,left_column,false,false,false,true);
+                this.editCell();
+                return false;
+            } else if(!cFlag && !sFlag && code == 38) { //Up
+                if(IndexRow - 1 < 0) return;
+                this.selectCell(IndexRow - 1,left_column,false,false,false,true);
+                return false;
+            } else if(!cFlag && !sFlag && code == 40) { //Down
+                if(IndexRow + 1 == LastRow) return;
+                this.selectCell(IndexRow + 1,left_column,false,false,false,true);
+                return false;
+            } else if((!cFlag && !sFlag && code == 39) || (!sFlag && code == 9)) { //Right
+                if(left_column + 1 > this.getColumnsNum()) return;
+                if(this.editor && this.editor.obj.selectionEnd != this.editor.obj.value.length && this.editor.obj.value.length != 0) return true;
+                else {
+                    this.selectCell(IndexRow,left_column + 1,false,false,false,true);
+                    return false;
+                }
+            } else if((!cFlag && !sFlag && code == 37) || (sFlag && code == 9)) { //Left
+                if(left_column - 1 < 0) return;
+                if(this.editor && this.editor.obj.selectionEnd != 0) return true;
+                else {
+                    this.selectCell(IndexRow,left_column - 1,false,false,false,true);
+                    return false;
+                }
+                return false;
+            } else if(!cFlag && !sFlag && code == 46) { //Del
+                    if(typeof top_row == "string") {
+                        this.cells(top_row,left_column).setValue("");
+                    } else { 
+                        for(var i = top_row; i <= bottom_row; i++){
+                            for(var j = left_column; j <= right_column; j++) {
+                                this.cells2(i,j).setValue("");
+                            }
+                        }
+                    }
+                return true;
+            } else if(!cFlag && sFlag && code == 46) { //Shift + Del
+                    if(typeof top_row == "string") {
+                        this.deleteRow(top_row);
+                    } else {
+                        for(var i = bottom_row; i >= top_row; i--){
+                            this.deleteRow(this.getRowId(i));
+                        }
+                    }
+                return true;
+            }  else if(cFlag && !sFlag && code == 68) { //Ctrl + D
+                for(var i = top_row + 1; i <= bottom_row; i++){
+                    for(var j = left_column; j <= right_column; j++) {
+                        this.cells2(i,j).setValue(this.cells2(top_row,j).getValue());
+                    }
+                }
+            } else if(cFlag && !sFlag && code == 67) { //Copy
+                var DataCB = [];
+                var DataCB1 = [];
+                if(typeof top_row == "string") {
+                    DataCB = this.cells(top_row,left_column).getValue() + "\n";
+                    copyTextToClipboard(DataCB);
+                    this.SelectCellEditor();
+                } else {
+                    for(var i = top_row; i <= bottom_row; i++){
+                        for(var j = left_column; j <= right_column; j++) {
+                            DataCB1.push(this.cells2(i,j).getValue().replace("\n",""));
+                        }
+                        if(DataCB1 != "") DataCB.push(DataCB1.join("\t"));
+                        DataCB1 = [];
+                    }
+                    copyTextToClipboard(DataCB.join("\r\n"));
+                }
+                return true;
+            } else if(cFlag && !sFlag && code == 86) { //Paste
+                // if(!this.editor) this.AddClipBoard();
+                // return true;
+                this.pasteBlockFromClipboard();
+            }
+            return true;
+        });
+
+    }
+
+
+    var saveDataGrid = () => {
+        let finishProcess = true;
+        gridMain.forEachRow(id => {
+            let gpmQty = gridMain.cells(id,2).getValue();
+            let actualQty = gridMain.cells(id,colCur[0]).getValue();
+            if(gpmQty != undefined && gpmQty != "" && (actualQty == undefined || actualQty == "")) finishProcess = false;
+        })
+
+        if(!finishProcess && !confirm("Còn sót SKU/LOT chưa điền số lượng thực tế? Bạn có muốn save")) {
+            alert("Hủy Lưu");
+        } else {
+            gridMain.SaveData(colCur);
+            alert("Lưu dữ liệu thành công");
+        }
+    }
+
+    dhtmlXGridObject.prototype.SaveData = (col) => {
+        console.log(col);
+        let dataSend = [];
+        gridMain.forEachRow((id) => {
+            let seq, sku, route, val;
+            let routeValue = [];
+            sku = gridMain.cells(id,0).getValue();
+            if(gridMain.cells(id,2).getValue() != undefined && gridMain.cells(id,2).getValue() != "") {
+                seq = gridMain.cells(id,0).getValue();
+                if(seq != "SKU") {
+                    col.forEach((c) => {
+                        route = gridMain.getColumnId(c).split('_');
+                        val = gridMain.cells(id,c).getValue();
+                        if(route.length == 2) {
+                            routeValue.push({
+                                "ROUTE": route[0],
+                                "CONFIRM": route[1],
+                                "VALUE": val
+                            })
+                        }
+                    })
+
+                    dataSend.push({
+                        "SEQ" : seq,
+                        "SKU" : sku,
+                        "DATA" : routeValue
+                    });
+                }
+            }
+        })
+
+        let result = AjaxAsync("api/report_lot/SaveReport/",{
+            "ROUTE":"{{Route}}",
+            "ID_JOB":"{{ID_JOB}}",
+            "DATA":dataSend
+        },"POST", "JSON");
+    }
+
+
+
+    
+</script>
