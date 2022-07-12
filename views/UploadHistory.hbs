@@ -1,0 +1,119 @@
+
+
+
+    <div style="width:100%;height:100%;overflow: auto;" id="bodyMain">
+       <div style="width:100%;height: 30px; background:rgb(0, 0, 0); color:white;font-size:15pt;" id="HeaderBody">
+            <div style="text-align:center;float:left;width:calc(100% - 110px);line-height:1.2;font-weight:bold">
+                Prepress Upload
+            </div>
+        </div>
+        
+        <div style="width:100%;height: calc(100% - 70px); background:blanchedalmond;margin-top:5px" id="GridMain"></div>
+        <div style="width:100%;height: 30px;margin-top:5px;" id="ToolbarMain">
+            
+        </div>
+    </div>
+<style>
+
+    #GridMain{
+        width:100% !important;
+    }
+
+</style>
+
+<script>
+    var gridMain, myToolbar;
+    var layoutMain, tabbarMain;
+    var sku;
+    var colCur = [];
+    var routeCode = "{{Route}}";
+    var modifyValue = false;
+
+    window.addEventListener('beforeunload', function (e) {
+        if(modifyValue ) {
+            e.returnValue = 'Sure';
+            e.preventDefault();
+            return 'Sure?';
+        }
+    });
+
+    var reloadPage = () => {
+        gridMain.clearAll();
+
+        let result = AjaxAsync("api/prepressupload/GetHistory/",{
+            "SOLINE":myToolbar.getValue("SOLINE"),
+            "FROM":myToolbar.getValue("dateFrom"),
+            "TO":myToolbar.getValue("dateTo")
+        },"GET", "JSON");
+
+        if(result.code == 200) {
+            let dataRaw = result.output;
+            dataRaw.forEach((v,i) => {
+                gridMain.addRow(i,[i,v.soline,v.typedocument,v.namefile,v.uploadby,v.uploaddate.replace("T", " ").replace("Z", "").substring(0,19),v.active, "Xem^" + urlServerSide + 'api/pdfRead/?URL=' + v.B])
+            })
+        }
+    }
+
+
+    var doOnLoad = () => {
+        myToolbar = new dhtmlXToolbarObject({
+				parent: "ToolbarMain",
+				icons_path: "/dhtmlx/common/imgs/"
+			});
+
+        myToolbar.addText("0", 0, "SOLine");
+        myToolbar.addInput("SOLINE", 1, "", 150);
+        myToolbar.addSeparator("2", 2);
+        myToolbar.addText("lTo", 3, "From:");
+        myToolbar.addInput("dateFrom", 4, formatDate(new Date()), 100);
+        myToolbar.addText("lFrom", 5, "From:");
+        myToolbar.addInput("dateTo", 6, formatDate(new Date()), 100);
+
+        myToolbar.addButton("Find", 7, "Find", "selection.gif", "selection.gif");
+
+        
+        var dateFrom = new dhtmlXCalendarObject(myToolbar.getInput("dateFrom"));
+        dateFrom.setDateFormat("%Y-%m-%d");
+        var dateTo = new dhtmlXCalendarObject(myToolbar.getInput("dateTo"));
+        dateTo.setDateFormat("%Y-%m-%d");
+
+
+        myToolbar.attachEvent("onClick", function(id){
+            if(id == "Find") reloadPage();
+        });
+
+
+        gridMain = new dhtmlXGridObject('GridMain');
+        gridMain.setImagePath("/dhtmlx/skins/web/imgs/");
+        gridMain.setHeader("No,SO Line,Type Document,File Name,Upload By,Update Time,Status,Xem");
+        gridMain.attachHeader(",#text_filter,#text_filter,#text_filter,#text_filter,,#text_filter")
+        gridMain.setColTypes("ro,ed,ro,ro,ro,ro,ro,link");
+        gridMain.setInitWidths("50,150,150,*,150,150,100,100");
+        gridMain.setColumnMinWidth("50,150,150,200,150,150,100,100");
+        gridMain.setColAlign("center,center,center,left,center,center,center,center");
+        gridMain.setStyle(
+            "text-align:center;font-weight:bold;",
+            "","background: blanchedalmond",""
+        );
+        gridMain.init();
+
+        reloadPage();
+    }
+
+
+
+    function formatDate(date) {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+
+        return [year, month, day].join('-');
+    }
+    
+</script>

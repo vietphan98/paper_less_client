@@ -43,7 +43,7 @@
 
     var doOnLoad = () => {
 
-        $("#navRight").html(`<button class="btn btn-outline-success my-2 my-sm-0" style="height: calc(1.2em + 0.75rem + 2px) !important;float: right !important;" onClick="saveDataGrid()">Save</button>`)
+        $("#navRight").html(`<button class="btn btn-outline-success my-2 my-sm-0" style="height: calc(1.2em + 0.75rem + 2px) !important;float: right !important; background: limegreen;color: black;font-weight: bold;" onClick="saveDataGrid()">Save</button>`)
 
         let iSorting = 0;
         let dataEmpty = [];
@@ -355,8 +355,21 @@
     }
 
     var saveDataGrid = () => {
-        gridMain.SaveData(colCur);
-        alert("Lưu dữ liệu thành công");
+        let finishProcess = true;
+        gridMain.forEachRow(id => {
+            let gpmQty = gridMain.cells(id,0).getValue();
+            let actualQty = gridMain.cells(id,colCur[0]).getValue();
+            if(gpmQty != "SKU" && gpmQty != undefined && gpmQty != "" && (actualQty == undefined || actualQty == "")) finishProcess = false;
+        })
+
+
+       if(!finishProcess && !confirm("Còn sót SKU chưa được Clear? Bạn có muốn save")) {
+            alert("Hủy Lưu");
+        } else {
+            gridMain.SaveData(colCur);
+            alert("Lưu dữ liệu thành công");
+            modifyValue = false;
+        }
     }
 
     dhtmlXGridObject.prototype.SaveData = (col) => {

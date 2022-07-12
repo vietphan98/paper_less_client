@@ -18,23 +18,40 @@
                 <div style="text-align:center;float:left;width:100%;line-height:1.2;font-weight:bold; background:black; color:white">
                     Thông tin trạm
                 </div>
-                <div style="witdh: 100%; height: 70px">
+                <div style="witdh: 100%; height: 50px">
                     <label>Người xem:</label>
-                    <div style="width:100%;text-align:center" ID="NTID">Hoàng Bình</div>
+                    <div style="width:100%;text-align:center" ID="NTIDUser"></div>
                 </div>
-                <div style="witdh: 100%; height: 70px">
+                <div style="witdh: 100%; height: 50px">
                     <label>Trạm:<a ID="PROCESS_CODE"></a></label> 
                     <div style="width:100%;text-align:center" ID="PROGESS_NAME">Cắt</div>
                 </div>
-                <div style="witdh: 100%; height: 70px">
+                <div style="witdh: 100%; height: 50px">
                     <label>JOB:</label>
                     <input disabled type="text" style="width:100%;text-align:center" id="JOB"></input>
                 </div>
-                <div style="witdh: 100%; height: 70px">
+                <div style="witdh: 100%; height: 60px">
                     <label for="LOT">LOT:</label>
                     <select name="LOT" id="LOT_SELECT" onchange="ViewLot();" style="width:100%">
+                        <option value="0">Mặt sau (Nếu có)</option>
                     </select>
                 </div>
+
+                <div style="witdh: 100%;">
+                    <input type="checkbox" name="cbGPM" id="cbGPM" />
+                    <label for="cbGPM">GPM</label>
+                </div>
+
+                <div style="witdh: 100%;">
+                    <input type="checkbox" name="cbLot" id="cbLot" />
+                    <label for="cbLot">Lot</label>
+                </div>
+
+                <div style="witdh: 100%;">
+                    <input type="checkbox" name="cbBSC" id="cbBSC" />
+                    <label for="cbBSC">Barcode, Size, Color</label>
+                </div>
+
                 <div style="witdh: 100%; height: 40px">
                     <input type="button" id ="Check"  value="Check" style="width:100%;height: 30px; background:black; color:white" ondblclick="javascript:btCheckdbl();void(0);" onclick="javascript:InsertData('Check');void(0);"></input>
                 </div>
@@ -480,7 +497,7 @@
         dhxWins = new dhtmlXWindows();
         $("#PROCESS_CODE").html(route);
         $("#JOB").html(jobID);
-        $("#NTID").html(NTID);
+        $("#NTIDUser").html(NTID);
 
         let result = AjaxAsync("api/layout_stepping/GetData/",{
             "ROUTE":route,
@@ -512,13 +529,22 @@
         let btValue = $("#Check").val();
         if(btValue == "Check") {
             let lot = $("#LOT_SELECT").val();
+
+            
+            let cbGPM = $("#cbGPM").is(":checked");
+            let cbLot = $("#cbLot").is(":checked");
+            let cbBSC = $("#cbBSC").is(":checked");
+            
             if(lot === "Choose lot") return  dhtmlx.alert(`Vui lòng chọn LOT `);
             let result = AjaxAsync("api/layout_stepping/InsertData/",{
                 "PROCESS_CODE":route,
                 "ID_JOB":jobID,
                 "LOT":lot,
                 "NTID":NTID,
-                "ACTION":action
+                "ACTION":action,
+                "GPM":cbGPM,
+                "LOT_C":cbLot,
+                "BSC":cbBSC
             },"POST", "JSON");
             if(result.code == 200) {
                 alert(result.mess);
@@ -591,11 +617,11 @@
         dhxWins.window(id).setText("View History");
         let gridMain = windowsHistory.attachGrid();
         gridMain.setImagePath("/dhtmlx/skins/web/imgs/");
-        gridMain.setHeader("ID,DATE,JOB,STATION,USER,LOT,ACTION");
-        gridMain.setColTypes("ro,ro,ro,ro,ro,ro,ro");
-        gridMain.setInitWidths("50,150,150,150,150,150,150");
-        gridMain.setColumnMinWidth("50,150,150,150,150,150,150");
-        gridMain.setColAlign("center,center,center,center,center,center,center");
+        gridMain.setHeader("ID,DATE,JOB,STATION,USER,LOT,ACTION,GPM,LOT Check,Barcode,Size,Color");
+        gridMain.setColTypes("ro,ro,ro,ro,ro,ro,ro,ch,ch,ch");
+        gridMain.setInitWidths("50,150,150,150,150,150,150,50,50,50");
+        gridMain.setColumnMinWidth("50,150,150,150,150,150,150,50,50,50");
+        gridMain.setColAlign("center,center,center,center,center,center,center,center,center,center");
         gridMain.setStyle(
             "text-align:center;font-weight:bold;",
             "","background: blanchedalmond",""
@@ -614,7 +640,7 @@
         },"GET", "JSON");
         let data = result.output;
         data.forEach((v,i) => {
-            gridMain.addRow(i,[v.id,v.createddate,v.id_job,stationName,v.username,v.lot,v.action]);
+            gridMain.addRow(i,[v.id,v.createddate.split("T")[0],v.id_job,stationName,v.username,v.lot,v.action,v.gpm,v.lot_check,v.bsc]);
         })
         
 

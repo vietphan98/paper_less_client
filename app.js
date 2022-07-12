@@ -140,6 +140,26 @@ app.get('/lot', (req, res, next) => {
     res.render('lot', objWeb);
 });
 
+app.get('/lott', (req, res, next) => {
+    let objWeb = {
+        title:"Bảng phân phối LOT",
+        ID_JOB:req.query.JOB,
+        Route:req.query.R,
+    }
+
+    res.render('lotnew', objWeb);
+});
+
+app.get('/uploadHistory', (req, res, next) => {
+    let objWeb = {
+        title:"Bảng phân phối LOT",
+        ID_JOB:req.query.JOB,
+        Route:req.query.R,
+    }
+
+    res.render('uploadhistory', objWeb);
+});
+
 
 app.get('/checklist/buildstock', (req, res, next) => {
     let objWeb = {
@@ -169,6 +189,15 @@ app.get('/checklist/laser',(req,res,next) =>{
         Route:req.query.R,
     }
     res.render('checklist_laser', objWeb)
+})
+app.get('/checklist/offset',(req,res,next) =>{
+    let objWeb = {
+        title: "Phiếu kiểm tra chất lượng  Offset",
+        ID_JOB : req.query.JOB,
+        SHOW:req.query.SHOW,
+        Route:req.query.R,
+    }
+    res.render('checklist_offset', objWeb)
 })
 
 

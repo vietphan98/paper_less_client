@@ -61,6 +61,7 @@
         let result = AjaxAsync("api/checklistLayout/GetData/",{
             "ROUTE":route,
             "ID_JOB":jobID,
+            "BU":bu,
             "NAME":clName
         },"GET", "JSON");
 
@@ -70,6 +71,7 @@
 
       
         let dataHTML = result.dataHTML;
+        let datachecklist = result.data;
         tabbarMain = new dhtmlXTabBar("LayoutMain");
 
         for(let p in dataHTML) {
@@ -82,17 +84,57 @@
                 tabbarMain.tabs(p).attachHTMLString(dataHTML[p]);
             }
         }
+
+            console.log(datachecklist);
+
+        datachecklist.forEach(p => {
+            if(p.check_value == "true") $("#" + p.cl_code).prop('checked', true);
+            else if(p.check_value == "") $("#" + p.cl_code).val(p.data_value);
+            
+            $("#" + p.cl_code + "_V").val(p.username);
+        });
     }
 
     var checkValue = e => {
         $("#" + e.id + "_V").val(localStorage.getItem("NTID"));
-        console.log(e.checked);
-        {{!-- let result = AjaxAsync("api/checklistLayout/SaveData/",{
+        let result = AjaxAsync("api/checklistLayout/CheckData/",{
             "ID_JOB":jobID,
+            "ROUTE":route,
             "BU":bu,
             "CODE":e.id,
-            "CHECKED": e.checked
-            "VALUE": localStorage.getItem("NTID"),
-        },"GET", "JSON"); --}}
+            "CHECKED": e.checked,
+            "DATA": "",
+            "NTID": localStorage.getItem("NTID"),
+        },"GET", "JSON");
+    }
+
+    var saveData = e => {
+        e.forEach(v => {
+            let result = AjaxAsync("api/checklistLayout/CheckData/",{
+                        "ID_JOB":jobID,
+                        "ROUTE":route,
+                        "BU":bu,
+                        "CODE":v,
+                        "CHECKED": "",
+                        "DATA": $("#" + v).val(),
+                        "NTID": localStorage.getItem("NTID"),
+                    },"GET", "JSON");
+        });
     }
 </script>
+
+<style> 
+
+td {
+    padding-left: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+th {
+    padding-left: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+</style>

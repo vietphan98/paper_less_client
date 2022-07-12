@@ -18,21 +18,21 @@
                 <div style="text-align:center;float:left;width:100%;line-height:1.2;font-weight:bold; background:black; color:white">
                     Thông tin trạm
                 </div>
-                <div style="witdh: 100%; height: 70px">
+                <div style="witdh: 100%; height: 60px">
                     <label>Người xem:</label>
                     <div style="width:100%;text-align:center" ID="NTID_Name"></div>
                 </div>
-                <div style="witdh: 100%; height: 70px">
+                <div style="witdh: 100%; height: 50px">
                     <label>Trạm:<a ID="PROCESS_CODE"></a></label> 
                     <div style="width:100%;text-align:center" ID="PROGESS_NAME"></div>
                 </div>
-                <div style="witdh: 100%; height: 70px">
+                <div style="witdh: 100%; height: 50px">
                     <label>JOB:</label>
                     <div style="width:100%;text-align:center" ID="JOB"></div>
                 </div>
-                <div style="witdh: 100%; height: 70px">
+                <div style="witdh: 100%; height: 60px">
                     <label for="SKU">SKU:</label>
-                    <select name="SKU" id="SKU" style="width:100%">
+                    <select name="SKU" id="SKU" onchange="ViewSKU();" style="width:100%">
                     
                     </select>
                 </div>
@@ -44,10 +44,15 @@
                     <input type="checkbox" name="cbQC" id="cbQC" />
                     <label for="cbQC">QC Check</label>
                 </div>
-                <div style="witdh: 100%; height: 80px;">
-                    <label>File Ảnh</label><input name="fileAnh" id="fileAnh" style="width:100%" />
+                
+                <div style="witdh: 100%; height: 130px;">
+                    <label>Ghi chú</label><textarea id="REMARK" style="width:100%;height:100px" ></textarea>
                 </div>
-                <div style="witdh: 100%; height: 40px;">
+
+                <div style="witdh: 100%; height: 60px;">
+                    <label>File Ảnh</label><input name="fileAnh" id="fileAnh" style="width:100%" readonly />
+                </div>
+                <div style="witdh: 100%; height: 70px;" id="btCamera">
                     <button style="width:100%;height: 30px; background:black; color:white" onClick="ChupHinh()">Chụp Hình</button>
                 </div>
                 
@@ -288,6 +293,8 @@
                                 </button>
                             </div>
                             <div id="toolbarViewerMiddle">
+                                <button id="zoomPDF" style="height:30px;margin-right:5px;padding: 0 5px 0 5px" onClick="zoomPDF(1.53)" title="Zoom Out" tabindex="21">Đúng kích thước Tablet</button>
+                                <input type="number" id="zoom" onchange="zoomValue()" class="toolbarField" title="Page" value="153" size="4" min="1" tabindex="15" data-l10n-id="page" autocomplete="off" max="200">
                                 <div class="splitToolbarButton">
                                 <button id="zoomOut" class="toolbarButton" title="Zoom Out" tabindex="21" data-l10n-id="zoom_out">
                                     <span data-l10n-id="zoom_out_label">Zoom Out</span>
@@ -456,6 +463,21 @@
 
 <script language="javascript">
 
+    document.getElementById("zoom").addEventListener("wheel", () => {
+        let z = $("#zoom").val();
+        PDFViewerApplication.pdfViewer.currentScaleValue = z/100;
+    });
+
+    var zoomValue = () => {
+        let z = $("#zoom").val();
+        PDFViewerApplication.pdfViewer.currentScaleValue = z/100;
+    }
+
+    var zoomPDF = e => {
+        PDFViewerApplication.pdfViewer.currentScaleValue = e;
+    }
+
+    var cameraArray = [];
 
     {{!-- https://printjs.crabbly.com/ --}}
 
@@ -475,7 +497,7 @@
         dhxWins = new dhtmlXWindows();
 
         setTimeout(() => {
-            PDFViewerApplication.pdfViewer.currentScaleValue = 1;
+            PDFViewerApplication.pdfViewer.currentScaleValue = 1.53;
             searchPDF("Layout Approval")
         }, 1000);
         $("#PROCESS_CODE").html(route);
@@ -501,9 +523,34 @@
             optEle.value = "SKU " + i;
             select.add(optEle);
         }
+        
+        loadCamera();
     }
 
+    var loadCamera = async () => {
+        let dv = await navigator.mediaDevices.enumerateDevices();
+        for (const deviceInfo of dv) {
+            if (deviceInfo.kind === 'videoinput') {
+                console.log(deviceInfo.label)
+                cameraArray.push(deviceInfo.deviceId);
+            }
+        }
+
+        if(cameraArray.length > 1) {
+            $("#btCamera").html(`
+                <button style="width:100%;height: 30px; background:black; color:white" onClick="ChupHinh(0)">Chụp Hình 1</button>
+                <button style="width:100%;height: 30px;margin-top:5px; background:black; color:white" onClick="ChupHinh(1)">Chụp Hình 2</button>
+            `)
+        } else  $("#btCamera").html(`
+                <button style="width:100%;height: 30px; background:black; color:white" onClick="ChupHinh(0)">Chụp Hình</button>
+            `)
+
+    }
+
+  
+
     var InsertData = action =>{
+        let remark = $("#REMARK").val();
         sku = $("#SKU").val();
         cbOps = $("#cbOps").is(":checked");
         cbQC= $("#cbQC").is(":checked");
@@ -515,7 +562,8 @@
             "SKU":sku,
             "OPS_CHECK":cbOps,
             "QC_CHECK":cbQC,
-            "IMG":IMG
+            "IMG":IMG,
+            "REMARK":remark
         },"POST", "JSON");
         if(result.code == 200) alert(result.mess)
     }
@@ -525,6 +573,16 @@
             dhxWins.unload();
             dhxWins = null;
         }
+    }
+
+    var ViewSKU = () => {
+        let stext = $("#SKU").val();
+        console.log(stext);
+        PDFViewerApplication.findBar.findField.value = stext + ":";
+        PDFViewerApplication.findBar.caseSensitive.checked = true;
+        PDFViewerApplication.findBar.highlightAll.checked = true;
+        PDFViewerApplication.findBar.findNextButton.click();
+        PDFViewerApplication.findBar.close();
     }
 
     var ViewHistory = () => {
@@ -545,11 +603,11 @@
         dhxWins.window(id).setText("View History");
         let gridMain = windowsHistory.attachGrid();
         gridMain.setImagePath("/dhtmlx/skins/web/imgs/");
-        gridMain.setHeader("ID,DATE,JOB,STATION,USER,SKU,QC Check,Ops Check,Ảnh");
-        gridMain.setColTypes("ro,ro,ro,ro,ro,ro,ch,ch,link");
-        gridMain.setInitWidths("50,150,150,150,150,50,50,50,150");
-        gridMain.setColumnMinWidth("50,150,150,150,150,50,50,50,150");
-        gridMain.setColAlign("center,center,center,center,center,center");
+        gridMain.setHeader("ID,DATE,JOB,STATION,USER,SKU,QC Check,Ops Check,Ghi chú,Ảnh");
+        gridMain.setColTypes("ro,ro,ro,ro,ro,ro,ch,ch,ed,link");
+        gridMain.setInitWidths("50,150,150,150,150,50,50,50,*,50");
+        gridMain.setColumnMinWidth("50,150,150,150,150,50,50,50,150,150");
+        gridMain.setColAlign("center,center,center,center,center,left,center");
         gridMain.setStyle(
             "text-align:center;font-weight:bold;",
             "","background: blanchedalmond",""
@@ -562,7 +620,7 @@
         },"GET", "JSON");
         let data = result.output;
         data.forEach((v,i) => {
-            gridMain.addRow(i,[v.id,v.createddate,v.id_job,stationName,v.username,v.sku,v.ops_check,v.qc_check,"Xem ảnh ^/img/" + v.img]);
+            gridMain.addRow(i,[v.id,v.createddate.split("T")[0],v.id_job,stationName,v.username,v.sku,v.ops_check,v.qc_check,v.remark,"Xem ảnh ^/img/" + v.img]);
         })
         gridMain.attachEvent("onCheck", function(rId,cInd,state){
             let cellValue = this.cells(rId, cInd).getValue()
@@ -574,7 +632,7 @@
 
 
     var Webcam;
-    var ChupHinh = () => {
+    var ChupHinh = (ind) => {
          var p = 0;
         dhxWins.forEachWindow(function(){p++;});
         if (p>1) {
@@ -597,18 +655,24 @@
             <input type=button style="margin-top:10px" value="Take Snapshot" onClick="take_snapshot()">
             <input type=button style="margin-top:10px" value="Save Snapshot" onClick="save_snapshot()">
         `);
+
+        var videoSource = cameraArray[ind];
+        const constraints = {
+            deviceId: videoSource ? {exact: videoSource} : undefined
+        };
+
         Webcam.set({
             width: 440,
             height: 313,
             dest_width: 640,
             dest_height: 480,
             image_format: 'jpeg',
-            jpeg_quality: 150
+            jpeg_quality: 150,
+            constraints: constraints
         });
-        Webcam.attach( '#my_camera' );
+        
+        Webcam.attach( '#my_camera' )
     }
-
-    
 
     let take_snapshot = () => {
         Webcam.snap( function(data_uri) {

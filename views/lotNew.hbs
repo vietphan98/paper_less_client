@@ -10,7 +10,7 @@
                 BẢNG PHÂN PHỐI SỐ LƯỢNG YÊU CẦU THEO LOT - {{ID_JOB}}
             </div>
         </div>
-        <div style="width:100%;height: 170px;">
+        <div style="height: 170px;">
             <div style="width:40%;height:100%;float:left;">
                 <table style="width:100%;height:100%;">
                      <tr style="height:1%">
@@ -101,13 +101,52 @@
                 </table>
             </div>
         </div>
-        <div style="width:100%;height: calc(100% - 200px); background:blanchedalmond;" id="GridMain"></div>
+        <div style="width:100%;height: calc(100% - 200px);">
+            <div style="width: calc(100% - 300px);height:100%;float:left" id="GridMain"></div>
+            <div style="width: 300px;height:100%;float:left">
+                <table style="width:100%;height:100%" border="1">
+                    <tr style="height:30px">
+                        <td style="width:25%">Cột</td>
+                        <td style="width:25%"><a ID="colInput"></a></td>
+                        <td style="width:25%">ID</td>
+                        <td style="width:25%"><a ID="idRow"></a></td>
+                    </tr>
+                    
+                    <tr style="height:30px">
+                        <td colspan="4"><input type="text" id="valInput" style="width:100%;height:100%" readonly/></td>
+                    </tr>
+                    <tr>
+                        <td><button onClick="setValueInput(7)" style="width:100%;height:100%;font-size: 3vw;">7</button></td>
+                        <td><button onClick="setValueInput(8)" style="width:100%;height:100%;font-size: 3vw;">8</button></td>
+                        <td><button onClick="setValueInput(9)" style="width:100%;height:100%;font-size: 3vw;">9</button></td>
+                        <td><button onClick="functionInput('S')" style="width:100%;height:100%;font-size: 1vw;">Del</button></td>
+                    </tr>
+                    <tr>
+                        <td><button onClick="setValueInput(4)" style="width:100%;height:100%;font-size: 3vw;">4</button></td>
+                        <td><button onClick="setValueInput(5)" style="width:100%;height:100%;font-size: 3vw;">5</button></td>
+                        <td><button onClick="setValueInput(6)" style="width:100%;height:100%;font-size: 3vw;">6</button></td>
+                        <td><button onClick="functionInput('A')" style="width:100%;height:100%;font-size: 1vw;">Xóa hết</button></td>
+                    </tr>
+                    <tr>
+                        <td><button onClick="setValueInput(1)" style="width:100%;height:100%;font-size: 3vw;">1</button></td>
+                        <td><button onClick="setValueInput(2)" style="width:100%;height:100%;font-size: 3vw;">2</button></td>
+                        <td><button onClick="setValueInput(3)" style="width:100%;height:100%;font-size: 3vw;">3</button></td>
+                        <td><button onClick="functionInput('U')" style="width:100%;height:100%;font-size: 1vw;">Lên</button></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><button onClick="setValueInput(0)" style="width:100%;height:100%;font-size: 3vw;">0</button></td>
+                        <td colspan="2"><button onClick="functionInput('E')" style="width:100%;height:100%;font-size: 2vw;">Enter</button></td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
     </div>
 
 <style>
 
     #GridMain{
-        width:100% !important;
+        {{!-- width:100% !important; --}}
     }
 
     td.borderCell {
@@ -123,6 +162,10 @@
     var dataJob;
     var colCur = [];
     var modifyValue = false;
+
+    var colInput = "";
+    var idInput = "";
+    var rowInput = "";
     window.addEventListener('beforeunload', function (e) {
         if(modifyValue ) {
             e.returnValue = 'Sure';
@@ -131,8 +174,54 @@
         }
     });
 
+    var changeInput = e => {
+        
+    }
+
+    var functionInput = e => {
+        if(e == "S") {
+            let data = $("#valInput").val();
+            data = data.substring(0, data.length - 1);
+            $("#valInput").val(data);
+            if(rowInput != "") gridMain.cells(idInput,colInput).setValue(data);
+        } else if(e == "A") {
+            data = "";
+            $("#valInput").val("");
+            if(rowInput != "") gridMain.cells(idInput,colInput).setValue("");
+        } else if(e == "U") {
+            if(rowInput == 0) return;
+            else {
+                rowInput--;
+                idInput = gridMain.getRowId(rowInput);
+                data = gridMain.cells(idInput,colInput).getValue();
+                $("#valInput").val(data);
+                $("#colInput").html(colInput);
+                $("#idRow").html(idInput);
+                gridMain.selectCell(rowInput,colInput,false,false,false,true);
+            }
+        } else if(e == "E") {
+            if(rowInput == gridMain.getRowsNum() - 1) return;
+            else {
+                rowInput++;
+                idInput = gridMain.getRowId(rowInput);
+                data = gridMain.cells(idInput,colInput).getValue();
+                $("#valInput").val(data);
+                $("#colInput").html(colInput);
+                $("#idRow").html(idInput);
+                gridMain.selectCell(rowInput,colInput,false,false,false,true);
+            }
+        }
+    }
+
+    var setValueInput = e => {
+        let data = $("#valInput").val();
+        data = data + e.toString();
+        $("#valInput").val(data);
+        if(rowInput != "") gridMain.cells(idInput,colInput).setValue(data);
+    }
+
     var doOnLoad = () => {
-        $("#navRight").html(`<button class="btn btn-outline-success my-2 my-sm-0" style="height: calc(1.2em + 0.75rem + 2px) !important;float: right !important;background: limegreen;color: black;font-weight: bold;" onClick="saveDataGrid()">Save</button>`)
+        $("#navRight").html(`<button class="btn btn-outline-success my-2 my-sm-0" style="height: calc(1.2em + 0.75rem + 2px) !important;float: right !important;" onClick="saveDataGrid()">Save</button>`)
         let dataEmpty = [];
         let colID = ["ID","SOL","GPM"]
         let colType = ["ro","ro","ed"];
@@ -197,7 +286,7 @@
 
             if(v.PROCESS_CODE == "{{Route}}") {
                 colType.push("ro");
-                colType.push("ed");
+                colType.push("ro");
 
                 colColor.push("#d5e1ff");
                 colColor.push("#d5f1ff");
@@ -314,6 +403,35 @@
                     }
                 } catch {}
             });
+
+        gridMain.attachEvent("onRowSelect", function(id,ind) {
+            var idColumn = this.getColumnId(ind);
+            rowInput = this.getRowIndex(id);
+
+
+            if(idColumn == "{{Route}}_B" && rowInput > 1) {
+                colInput = ind;
+                idInput = id;
+                console.log(gridMain.cells(id, ind).getValue())
+                let D = gridMain.cells(id, ind).getValue();
+                $("#valInput").val(D);
+            } else if(idColumn == "{{Route}}_B" && rowInput == 0) {
+                let conf = prompt("Vui lòng nhập ghi chú");
+                gridMain.cells(id, ind).setValue(conf);
+                colInput = "";
+                idInput = "";
+                rowInput = "";
+                $("#valInput").val("");
+            } else {
+                colInput = "";
+                idInput = "";
+                rowInput = "";
+                $("#valInput").val("");
+            }
+            $("#colInput").html(colInput);
+            $("#idRow").html(idInput);
+        })
+
 
         gridMain.forEachRow(id => {
             if(gridMain.cells(id,2).getValue() == Math.max.apply(Math, alignSKU).toString()) gridMain.cells(id,1).setValue("X");
@@ -447,7 +565,6 @@
         } else {
             gridMain.SaveData(colCur);
             alert("Lưu dữ liệu thành công");
-            modifyValue = false;
         }
     }
 
